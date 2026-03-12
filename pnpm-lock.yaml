@@ -24,6 +24,12 @@ importers:
       '@biomejs/biome':
         specifier: ^2.3.11
         version: 2.4.6
+      '@ragempcommunity/types-client':
+        specifier: ^2.1.9
+        version: 2.1.9
+      '@ragempcommunity/types-server':
+        specifier: ^2.1.9
+        version: 2.1.9
       '@types/node':
         specifier: ^25.0.3
         version: 25.4.0
@@ -92,6 +98,12 @@ packages:
       reflect-metadata: ^0.2.2
       tsyringe: ^4.10.0
       zod: ^4.3.5
+
+  '@ragempcommunity/types-client@2.1.9':
+    resolution: {integrity: sha512-D6SdgzyyuHdQyVDSPVohII6EWbwmWTmOBynVU9BcIHxvtVbr82ZmQ+YzMVlihcEiOk/nt8aeWSzcrWdXXHkgeA==}
+
+  '@ragempcommunity/types-server@2.1.9':
+    resolution: {integrity: sha512-J0aDQxzGBW3l8JniyDNZl17JJFXjjy59LHeQKjNgPk3kWpW/mOuPQ1L90euZFkAx0PPGT96IA3+bHq4zarNEmA==}
 
   '@types/node@25.4.0':
     resolution: {integrity: sha512-9wLpoeWuBlcbBpOY3XmzSTG3oscB6xjBEEtn+pYXTfhyXhIxC5FsBer2KTopBlvKEiW9l13po9fq+SJY/5lkhw==}
@@ -164,6 +176,10 @@ snapshots:
       tsyringe: 4.10.0
       uuid: 13.0.0
       zod: 4.3.6
+
+  '@ragempcommunity/types-client@2.1.9': {}
+
+  '@ragempcommunity/types-server@2.1.9': {}
 
   '@types/node@25.4.0':
     dependencies:

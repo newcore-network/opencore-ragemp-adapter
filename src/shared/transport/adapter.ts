@@ -1,13 +1,13 @@
-import { MessagingTransport } from '@open-core/framework'
+import { MessagingTransport, type RuntimeContext } from '@open-core/framework'
 import { RageMPEvents } from './ragemp.events'
 import { RageMPRpc } from './ragemp.rpc'
 
-function isServerContext(): boolean {
-  return !('local' in mp.players)
+function getRuntimeContext(): RuntimeContext {
+  return 'local' in mp.players ? 'client' : 'server'
 }
 
 export class RageMPMessagingTransport extends MessagingTransport {
-  readonly context = isServerContext() ? 'server' : 'client'
+  readonly context: RuntimeContext = getRuntimeContext()
   readonly events = new RageMPEvents(this.context)
   readonly rpc = new RageMPRpc(this.context)
 }

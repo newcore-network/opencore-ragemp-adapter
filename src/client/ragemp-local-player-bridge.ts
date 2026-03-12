@@ -8,10 +8,6 @@ import { Vector3 } from '@open-core/framework'
 @injectable()
 export class RageMPLocalPlayerBridge extends IClientLocalPlayerBridge {
   setPosition(position: Vector3, heading?: number): void {
-    if (!mp.players.local) {
-      return
-    }
-
     mp.players.local.position = new mp.Vector3(position.x, position.y, position.z)
 
     if (typeof heading === 'number') {

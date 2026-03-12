@@ -28,8 +28,11 @@
     "./package.json": "./package.json"
   },
   "scripts": {
-    "build": "tsc -p tsconfig.build.json",
-    "typecheck": "tsc -p tsconfig.build.json --noEmit",
+    "build": "tsc -b",
+    "typecheck": "tsc -b --noEmit",
+    "build:shared": "tsc -b src/shared",
+    "build:client": "tsc -b src/client",
+    "build:server": "tsc -b src/server",
     "check": "pnpm typecheck",
     "format": "biome format --fix"
   },
@@ -51,6 +54,8 @@
   },
   "devDependencies": {
     "@biomejs/biome": "^2.3.11",
+    "@ragempcommunity/types-client": "^2.1.9",
+    "@ragempcommunity/types-server": "^2.1.9",
     "@types/node": "^25.0.3",
     "typescript": "^5.9.3"
   }

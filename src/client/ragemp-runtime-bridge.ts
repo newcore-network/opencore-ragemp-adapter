@@ -13,7 +13,14 @@ import { KEYBOARD_KEY_MAP, MOUSE_KEY_MAP } from './key-maps'
 @injectable()
 export class RageMPRuntimeBridge extends IClientRuntimeBridge {
   private readonly tickHandles = new Map<unknown, ReturnType<typeof setInterval>>()
+  private readonly commandHandlers = new Map<string, (...args: any[]) => void>()
   private tickSeq = 0
+
+  private executeRegisteredCommand(commandName: string, ...args: any[]): void {
+    const handler = this.commandHandlers.get(commandName)
+    if (!handler) return
+    handler(...args)
+  }
 
   getCurrentResourceName(): string {
     // RageMP does not provide an equivalent to FiveM's GetCurrentResourceName().
@@ -51,10 +58,11 @@ export class RageMPRuntimeBridge extends IClientRuntimeBridge {
     _restricted: boolean,
   ): void {
     if (commandName.startsWith('+') || commandName.startsWith('-')) {
-      mp.events.add(commandName, () => handler())
-    } else {
-      mp.events.addCommand(commandName, (...args: any[]) => handler(...args))
+      this.commandHandlers.set(commandName, handler)
+      return
     }
+
+    // RageMP does not support registering chat/console commands from the client.
   }
 
   registerKeyMapping(
@@ -74,10 +82,12 @@ export class RageMPRuntimeBridge extends IClientRuntimeBridge {
     if (keyCode === undefined) return
 
     mp.keys.bind(keyCode, true, () => {
-      mp.events.call(`+${commandName}`)
+      this.executeRegisteredCommand(commandName)
     })
     mp.keys.bind(keyCode, false, () => {
-      mp.events.call(`-${commandName}`)
+      this.executeRegisteredCommand(
+        commandName.startsWith('+') ? `-${commandName.slice(1)}` : `-${commandName}`,
+      )
     })
   }
 
