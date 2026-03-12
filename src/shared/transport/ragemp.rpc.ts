@@ -1,0 +1,274 @@
+import { RpcAPI, type RpcTarget } from '@open-core/framework'
+import type { RuntimeContext } from '@open-core/framework'
+import { onNet, emitNet } from './helpers'
+
+type RpcWireCall = {
+  kind: 'call'
+  id: string
+  name: string
+  args: unknown[]
+}
+
+type RpcWireNotify = {
+  kind: 'notify'
+  id: string
+  name: string
+  args: unknown[]
+}
+
+type RpcWireResult = {
+  kind: 'result'
+  id: string
+  ok: true
+  result: unknown
+}
+
+type RpcWireError = {
+  kind: 'result'
+  id: string
+  ok: false
+  error: {
+    message: string
+    name?: string
+  }
+}
+
+type RpcWireAck = {
+  kind: 'ack'
+  id: string
+}
+
+type RpcWireMessage = RpcWireCall | RpcWireNotify | RpcWireResult | RpcWireError | RpcWireAck
+
+type PendingEntry<TResult> = {
+  resolve: (value: TResult) => void
+  reject: (reason?: unknown) => void
+  timeout: ReturnType<typeof setTimeout>
+}
+
+function getCurrentResourceNameSafe(): string {
+  if (typeof __dirname !== 'string') return 'default'
+  const parts = __dirname.replace(/\\/g, '/').split('/')
+  return parts[parts.length - 1] || 'default'
+}
+
+export class RageMPRpc<C extends RuntimeContext = RuntimeContext> extends RpcAPI<C> {
+  private readonly pending = new Map<string, PendingEntry<unknown>>()
+  private requestSeq = 0
+  private readonly handlers = new Map<
+    string,
+    (ctx: { requestId: string; clientId?: number; raw?: unknown }, ...args: any[]) => unknown
+  >()
+
+  private readonly channel = getCurrentResourceNameSafe()
+  private readonly requestEvent = `__oc:rpc:req:${this.channel}`
+  private readonly responseEvent = `__oc:rpc:res:${this.channel}`
+
+  private readonly defaultTimeoutMs = 7_500
+
+  constructor(private readonly context: C) {
+    super()
+
+    onNet(context, this.requestEvent, (source, msg: RpcWireMessage) => {
+      void this.handleRequestMessage(msg, source)
+    })
+
+    onNet(context, this.responseEvent, (_source, msg: RpcWireMessage) => {
+      this.handleResponseMessage(msg)
+    })
+  }
+
+  on<TArgs extends any[], TResult>(
+    name: string,
+    handler: (
+      ctx: { requestId: string; clientId?: number; raw?: unknown },
+      ...args: TArgs
+    ) => TResult | Promise<TResult>,
+  ): void {
+    this.handlers.set(name, handler as any)
+  }
+
+  call<TResult = unknown>(name: string, ...args: any[]): Promise<TResult> {
+    const { target, payload } = this.normalizeInvocation(name, 'call', args)
+    return this.sendAndWait<TResult>({ kind: 'call', name, args: payload }, target)
+  }
+
+  notify(name: string, ...args: any[]): Promise<void> {
+    const { target, payload } = this.normalizeInvocation(name, 'notify', args)
+    return this.sendAndWait<void>({ kind: 'notify', name, args: payload }, target)
+  }
+
+  private normalizeInvocation(
+    name: string,
+    kind: 'call' | 'notify',
+    args: any[],
+  ): { target?: RpcTarget; payload: any[] } {
+    if (this.context === 'server') {
+      if (args.length === 0) {
+        throw new Error(`RageMPRpc: missing target for '${kind}' '${name}' in server context`)
+      }
+
+      const [target, ...payload] = args
+      if (!this.isValidTarget(target)) {
+        throw new Error(`RageMPRpc: invalid target for '${kind}' '${name}'`)
+      }
+
+      if (kind === 'call' && target === 'all') {
+        throw new Error(`RageMPRpc: target=all is not supported for call '${name}'`)
+      }
+
+      return { target, payload }
+    }
+
+    return { target: undefined, payload: args }
+  }
+
+  private isValidTarget(value: unknown): value is RpcTarget {
+    if (value === 'all') return true
+    if (typeof value === 'number') return true
+    if (Array.isArray(value)) return value.every((item) => typeof item === 'number')
+    return false
+  }
+
+  private sendAndWait<TResult>(
+    input: { kind: 'call' | 'notify'; name: string; args: unknown[] },
+    target?: RpcTarget,
+  ): Promise<TResult> {
+    const id = this.createRequestId()
+
+    const msg: RpcWireMessage = {
+      kind: input.kind,
+      id,
+      name: input.name,
+      args: input.args ?? [],
+    } as RpcWireMessage
+
+    return new Promise<TResult>((resolve, reject) => {
+      const timeout = setTimeout(() => {
+        this.pending.delete(id)
+        reject(
+          new Error(
+            `RageMPRpc: timeout waiting for '${input.kind}' response for '${input.name}' (${id})`,
+          ),
+        )
+      }, this.defaultTimeoutMs)
+
+      this.pending.set(id, { resolve: resolve as any, reject, timeout })
+
+      if (this.context === 'server') {
+        const resolvedTarget = this.resolveServerTarget(target, input.kind, input.name)
+        emitNet(this.context, this.requestEvent, resolvedTarget, msg)
+      } else {
+        emitNet(this.context, this.requestEvent, -1, msg)
+      }
+    })
+  }
+
+  private createRequestId(): string {
+    this.requestSeq += 1
+    const ts = Date.now().toString(36)
+    const seq = this.requestSeq.toString(36)
+    const rand = Math.floor(Math.random() * 1_000_000_000).toString(36)
+    return `${this.channel}:${this.context}:${ts}:${seq}:${rand}`
+  }
+
+  private resolveServerTarget(
+    target: RpcTarget | undefined,
+    kind: 'call' | 'notify',
+    name: string,
+  ): number | number[] | -1 {
+    if (target === undefined) {
+      throw new Error(`RageMPRpc: missing target for '${kind}' '${name}' in server context`)
+    }
+    if (kind === 'call' && target === 'all') {
+      throw new Error(`RageMPRpc: target=all is not supported for call '${name}'`)
+    }
+    if (target === 'all') return -1
+    return target
+  }
+
+  private async handleRequestMessage(msg: RpcWireMessage, source?: PlayerMp): Promise<void> {
+    if (msg.kind !== 'call' && msg.kind !== 'notify') return
+
+    const handler = this.handlers.get(msg.name)
+    const sourceId = source?.id
+    const replyTarget = this.context === 'server' ? sourceId : undefined
+
+    if (!handler) {
+      if (msg.kind === 'call') {
+        this.emitResponse(replyTarget, {
+          kind: 'result',
+          id: msg.id,
+          ok: false,
+          error: { message: `RageMPRpc: no handler registered for '${msg.name}'` },
+        })
+      } else {
+        this.emitResponse(replyTarget, { kind: 'ack', id: msg.id })
+      }
+      return
+    }
+
+    try {
+      const result = await Promise.resolve(
+        handler(
+          {
+            requestId: msg.id,
+            clientId: sourceId,
+            // raw is the PlayerMp object (analogous to FiveM's global.source).
+            raw: source,
+          },
+          ...(msg.args as any[]),
+        ),
+      )
+
+      if (msg.kind === 'notify') {
+        this.emitResponse(replyTarget, { kind: 'ack', id: msg.id })
+      } else {
+        this.emitResponse(replyTarget, { kind: 'result', id: msg.id, ok: true, result })
+      }
+    } catch (err: any) {
+      if (msg.kind === 'notify') {
+        this.emitResponse(replyTarget, { kind: 'ack', id: msg.id })
+        return
+      }
+
+      this.emitResponse(replyTarget, {
+        kind: 'result',
+        id: msg.id,
+        ok: false,
+        error: {
+          message: err?.message ? String(err.message) : String(err),
+          name: err?.name ? String(err.name) : undefined,
+        },
+      })
+    }
+  }
+
+  private handleResponseMessage(msg: RpcWireMessage): void {
+    if (msg.kind !== 'result' && msg.kind !== 'ack') return
+
+    const pending = this.pending.get(msg.id)
+    if (!pending) return
+
+    clearTimeout(pending.timeout)
+    this.pending.delete(msg.id)
+
+    if (msg.kind === 'ack') {
+      pending.resolve(undefined)
+      return
+    }
+
+    if (msg.ok) {
+      pending.resolve(msg.result)
+      return
+    }
+
+    const error = new Error(msg.error?.message ?? 'RageMPRpc: remote error')
+    ;(error as any).name = msg.error?.name ?? error.name
+    pending.reject(error)
+  }
+
+  private emitResponse(target: number | undefined, msg: RpcWireMessage): void {
+    emitNet(this.context, this.responseEvent, target ?? -1, msg)
+  }
+}
