@@ -42,7 +42,7 @@
   "license": "MPL-2.0",
   "packageManager": "pnpm@10.13.1",
   "dependencies": {
-    "@open-core/framework": "file:../opencore"
+    "@open-core/framework": "file:../opencore-framework"
   },
   "peerDependencies": {
     "reflect-metadata": "^0.2.2",
