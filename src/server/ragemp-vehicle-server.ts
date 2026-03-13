@@ -14,9 +14,9 @@ export class RageMPVehicleServer extends IVehicleServer {
     z: number,
     heading: number,
   ): number {
-    const vehicle = (mp.vehicles as any).new(modelHash, new mp.Vector3(x, y, z), {
+    const vehicle = mp.vehicles.new(modelHash, new mp.Vector3(x, y, z), {
       heading,
-    }) as VehicleMp
+    })
     return vehicle.id
   }
 

@@ -12,10 +12,17 @@ const EVENT_MAP: RuntimeEventMap = {
   [RUNTIME_EVENTS.playerDropped]: 'playerQuit',
 }
 
+type EngineHandler = (...args: readonly unknown[]) => void
+
+function isPlayerMp(value: unknown): value is PlayerMp {
+  return typeof value === 'object' && value !== null && 'id' in value
+}
+
 export class RageMPEngineEvents extends IEngineEvents {
   constructor() {
     super()
-    this.onRuntime(RUNTIME_EVENTS.playerCommand, (player: PlayerMp, command: string) => {
+    this.onRuntime(RUNTIME_EVENTS.playerCommand, (player: unknown, command: unknown) => {
+      if (!isPlayerMp(player) || typeof command !== 'string') return
       const [commandName, ...args] = command.trim().split(/\s+/)
       if (!commandName) return
       this.emit('core:execute-command', player, commandName, args)
@@ -26,12 +33,12 @@ export class RageMPEngineEvents extends IEngineEvents {
     return EVENT_MAP
   }
 
-  override onRuntime(eventName: RuntimeEventName, handler?: (...args: any[]) => void): void {
+  override onRuntime(eventName: RuntimeEventName, handler?: EngineHandler): void {
     if (!handler) return
 
     const mpEvent = this.getRuntimeEventMap()[eventName] ?? eventName
 
-    mp.events.add(mpEvent, (player: PlayerMp, ...args: any[]) => {
+    mp.events.add(mpEvent, (player: PlayerMp, ...args: unknown[]) => {
       const license = player.rgscId
 
       if (eventName === RUNTIME_EVENTS.playerJoining) {
@@ -48,14 +55,14 @@ export class RageMPEngineEvents extends IEngineEvents {
     })
   }
 
-  on(eventName: string, handler?: (...args: any[]) => void): void {
+  on(eventName: string, handler?: EngineHandler): void {
     if (!handler) return
-    mp.events.add(eventName, (...args: any[]) => {
+    mp.events.add(eventName, (...args: unknown[]) => {
       handler(...args)
     })
   }
 
-  emit(eventName: string, ...args: any[]): void {
+  emit(eventName: string, ...args: readonly unknown[]): void {
     mp.events.call(eventName, ...args)
   }
 }

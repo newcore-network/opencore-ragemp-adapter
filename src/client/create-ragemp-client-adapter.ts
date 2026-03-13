@@ -1,3 +1,4 @@
+import type { InjectionToken } from 'tsyringe'
 import {
   defineClientAdapter,
   IClientLocalPlayerBridge,
@@ -20,11 +21,23 @@ export function RageMPClientAdapter(): OpenCoreClientAdapter {
     name: 'ragemp',
     register(ctx) {
       ctx.bindMessagingTransport(new RageMPMessagingTransport())
-      ctx.bindSingleton(IHasher as any, RageMPClientHasher)
-      ctx.bindSingleton(IClientRuntimeBridge as any, RageMPRuntimeBridge)
-      ctx.bindSingleton(IClientLocalPlayerBridge as any, RageMPLocalPlayerBridge)
-      ctx.bindSingleton(IClientPlatformBridge as any, RageMPPlatformBridge)
-      ctx.bindSingleton(IPedAppearanceClient as any, RageMPPedAppearanceClient)
+      ctx.bindSingleton(IHasher as InjectionToken<IHasher>, RageMPClientHasher)
+      ctx.bindSingleton(
+        IClientRuntimeBridge as InjectionToken<IClientRuntimeBridge>,
+        RageMPRuntimeBridge,
+      )
+      ctx.bindSingleton(
+        IClientLocalPlayerBridge as InjectionToken<IClientLocalPlayerBridge>,
+        RageMPLocalPlayerBridge,
+      )
+      ctx.bindSingleton(
+        IClientPlatformBridge as InjectionToken<IClientPlatformBridge>,
+        RageMPPlatformBridge,
+      )
+      ctx.bindSingleton(
+        IPedAppearanceClient as InjectionToken<IPedAppearanceClient>,
+        RageMPPedAppearanceClient,
+      )
     },
   })
 }

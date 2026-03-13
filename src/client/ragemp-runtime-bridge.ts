@@ -3,6 +3,10 @@ import { IClientRuntimeBridge } from '@open-core/framework/client'
 import { exportsRegistry } from '../shared/exports-registry'
 import { KEYBOARD_KEY_MAP, MOUSE_KEY_MAP } from './key-maps'
 
+type CommandHandler = (...args: readonly unknown[]) => void
+type RuntimeHandler = (...args: readonly unknown[]) => void | Promise<void>
+type RuntimeExport = (...args: readonly unknown[]) => unknown
+
 /**
  * RAGE Multiplayer implementation of the client runtime bridge.
  *
@@ -13,10 +17,10 @@ import { KEYBOARD_KEY_MAP, MOUSE_KEY_MAP } from './key-maps'
 @injectable()
 export class RageMPRuntimeBridge extends IClientRuntimeBridge {
   private readonly tickHandles = new Map<unknown, ReturnType<typeof setInterval>>()
-  private readonly commandHandlers = new Map<string, (...args: any[]) => void>()
+  private readonly commandHandlers = new Map<string, CommandHandler>()
   private tickSeq = 0
 
-  private executeRegisteredCommand(commandName: string, ...args: any[]): void {
+  private executeRegisteredCommand(commandName: string, ...args: readonly unknown[]): void {
     const handler = this.commandHandlers.get(commandName)
     if (!handler) return
     handler(...args)
@@ -46,15 +50,15 @@ export class RageMPRuntimeBridge extends IClientRuntimeBridge {
     return parts[parts.length - 1] || 'default'
   }
 
-  on(eventName: string, handler: (...args: any[]) => void | Promise<void>): void {
-    mp.events.add(eventName, (...args: any[]) => {
+  on(eventName: string, handler: RuntimeHandler): void {
+    mp.events.add(eventName, (...args: unknown[]) => {
       void handler(...args)
     })
   }
 
   registerCommand(
     commandName: string,
-    handler: (...args: any[]) => void,
+    handler: CommandHandler,
     _restricted: boolean,
   ): void {
     if (commandName.startsWith('+') || commandName.startsWith('-')) {
@@ -109,12 +113,12 @@ export class RageMPRuntimeBridge extends IClientRuntimeBridge {
   }
 
   getGameTimer(): number {
-    return mp.game.invoke('0xA4EA0691') // GetGameTimer
+    return mp.game.invoke('0xA4EA0691') as number
   }
 
   registerNuiCallback(
     _eventName: string,
-    _handler: (data: any, cb: (response: unknown) => void) => void | Promise<void>,
+    _handler: (data: unknown, cb: (response: unknown) => void) => void | Promise<void>,
   ): void {
     // TODO: Still looking for a good way to implement this.
   }
@@ -131,7 +135,7 @@ export class RageMPRuntimeBridge extends IClientRuntimeBridge {
     // TODO: Still looking for a good way to implement this.
   }
 
-  registerExport(exportName: string, handler: (...args: any[]) => any): void {
+  registerExport(exportName: string, handler: RuntimeExport): void {
     exportsRegistry.register(this.getCurrentResourceName(), exportName, handler)
   }
 }

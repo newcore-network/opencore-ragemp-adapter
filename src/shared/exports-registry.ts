@@ -3,7 +3,8 @@
  * Registry layout: Map<resource, Map<exportName, handler>>
  */
 
-type ExportHandler = (...args: any[]) => any
+type ExportArgs = readonly unknown[]
+type ExportHandler = (...args: ExportArgs) => unknown
 
 // Two-level index type: exports[resource][name](...args)
 export type ExportsProxy = {
@@ -25,7 +26,7 @@ export class ExportsRegistry {
     namespace.set(name, handler)
   }
 
-  call(resource: string, name: string, ...args: any[]): any {
+  call(resource: string, name: string, ...args: ExportArgs): unknown {
     const namespace = this.registry.get(resource)
     if (!namespace) throw new Error(`[exports] Resource "${resource}" has no registered exports.`)
     const handler = namespace.get(name)
@@ -42,7 +43,7 @@ export class ExportsRegistry {
       namespaceProxy = new Proxy({} as Record<string, ExportHandler>, {
         get:
           (_, name: string) =>
-          (...args: any[]) =>
+          (...args: ExportArgs) =>
             this.call(resource, name, ...args),
       })
       this.namespaceProxyCache.set(resource, namespaceProxy)
@@ -58,7 +59,7 @@ export class ExportsRegistry {
           namespaceProxy = new Proxy({} as Record<string, ExportHandler>, {
             get:
               (_, name: string) =>
-              (...args: any[]) =>
+              (...args: ExportArgs) =>
                 this.call(resource, name, ...args),
           })
           this.namespaceProxyCache.set(resource, namespaceProxy)
@@ -75,6 +76,6 @@ export function registerExport(resource: string, name: string, handler: ExportHa
   exportsRegistry.register(resource, name, handler)
 }
 
-export function callExport(resource: string, name: string, ...args: any[]): any {
+export function callExport(resource: string, name: string, ...args: ExportArgs): unknown {
   return exportsRegistry.call(resource, name, ...args)
 }
