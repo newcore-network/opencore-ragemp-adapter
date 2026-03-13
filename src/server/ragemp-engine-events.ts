@@ -6,6 +6,15 @@ const EVENT_MAP: Record<string, string> = {
 }
 
 export class RageMPEngineEvents extends IEngineEvents {
+  constructor() {
+    super()
+    this.on('playerCommand', (player: PlayerMp, command: string) => {
+      const [commandName, ...args] = command.trim().split(/\s+/)
+      if (!commandName) return
+      this.emit('core:execute-command', player, commandName, args)
+    })
+  }
+
   on(eventName: string, handler?: (...args: any[]) => void): void {
     if (!handler) return
 
