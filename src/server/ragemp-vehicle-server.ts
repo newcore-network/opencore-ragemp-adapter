@@ -38,7 +38,7 @@ export class RageMPVehicleServer extends IVehicleServer {
   }
 
   setDoorsLocked(handle: number, state: number): void {
-    mp.vehicles.at(handle).locked = state !== 0
+    mp.vehicles.at(handle).locked = state >= 2
   }
 
   getNetworkIdFromEntity(handle: number): number {

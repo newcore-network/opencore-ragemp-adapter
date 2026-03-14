@@ -9,6 +9,10 @@ import type {
 
 @injectable()
 export class RageMPVehicleLifecycleServer extends IVehicleLifecycleServer {
+  private toRageMPSeatIndex(seatIndex: number): number {
+    return seatIndex < 0 ? 0 : seatIndex + 1
+  }
+
   constructor(@inject(IVehicleServer as any) private readonly vehicleServer: IVehicleServer) {
     super()
   }
@@ -23,7 +27,7 @@ export class RageMPVehicleLifecycleServer extends IVehicleLifecycleServer {
       request.heading,
     )
 
-    if (!handle || handle === 0) {
+    if (!Number.isFinite(handle) || handle < 0) {
       throw new Error('Failed to create vehicle entity')
     }
 
@@ -36,11 +40,12 @@ export class RageMPVehicleLifecycleServer extends IVehicleLifecycleServer {
   async warpPlayerIntoVehicle(request: WarpPlayerIntoVehicleRequest): Promise<void> {
     const player = mp.players.at(Number(request.playerSrc))
     const vehicle = mp.vehicles.at(request.networkId)
+    const seatIndex = this.toRageMPSeatIndex(request.seatIndex)
 
     await new Promise<void>((resolve) => setTimeout(resolve, 200))
 
     try {
-      player.putIntoVehicle(vehicle, request.seatIndex)
+      player.putIntoVehicle(vehicle, seatIndex)
     } catch {
       const offset = new mp.Vector3(vehicle.position.x + 1.5, vehicle.position.y, vehicle.position.z)
       player.position = offset

@@ -26,7 +26,7 @@ export class RageMPNpcLifecycleServer extends INpcLifecycleServer {
       request.networked,
     )
 
-    if (!handle || handle <= 0) {
+    if (!Number.isFinite(handle) || handle < 0) {
       throw new Error('Failed to create NPC ped entity')
     }
 

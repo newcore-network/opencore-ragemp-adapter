@@ -1,14 +1,21 @@
 import type { InjectionToken } from 'tsyringe'
 import {
   defineClientAdapter,
+  IClientWebViewBridge,
+  PlatformBlipBridge,
+  PlatformMarkerBridge,
+  PlatformNotificationBridge,
+  IClientLocalPlayerBridge,
+  IClientPlatformBridge,
+  IClientRuntimeBridge,
   type OpenCoreClientAdapter,
 } from '@open-core/framework/client'
 import {
+  IClientBlipBridge,
   IClientLogConsole,
-  IClientLocalPlayerBridge,
-  IClientPlatformBridge,
+  IClientMarkerBridge,
+  IClientNotificationBridge,
   IClientSpawnBridge,
-  IClientRuntimeBridge,
   IPedAppearanceClient,
 } from '@open-core/framework/contracts/client'
 import { RageMPMessagingTransport } from '../shared/transport/adapter'
@@ -19,6 +26,7 @@ import { RageMPLocalPlayerBridge } from './ragemp-local-player-bridge'
 import { RageMPPedAppearanceClient, RageMPPlatformBridge } from './ragemp-platform-bridge'
 import { RageMPClientSpawnBridge } from './ragemp-spawn-bridge'
 import { RageMPRuntimeBridge } from './ragemp-runtime-bridge'
+import { RageMPClientWebViewBridge } from './ragemp-webview-bridge'
 import { IHasher } from '@open-core/framework/contracts'
 
 /**
@@ -51,6 +59,19 @@ export function RageMPClientAdapter(): OpenCoreClientAdapter {
       ctx.bindSingleton(
         IClientSpawnBridge as InjectionToken<IClientSpawnBridge>,
         RageMPClientSpawnBridge,
+      )
+      ctx.bindSingleton(IClientBlipBridge as InjectionToken<IClientBlipBridge>, PlatformBlipBridge)
+      ctx.bindSingleton(
+        IClientMarkerBridge as InjectionToken<IClientMarkerBridge>,
+        PlatformMarkerBridge,
+      )
+      ctx.bindSingleton(
+        IClientNotificationBridge as InjectionToken<IClientNotificationBridge>,
+        PlatformNotificationBridge,
+      )
+      ctx.bindSingleton(
+        IClientWebViewBridge as InjectionToken<IClientWebViewBridge>,
+        RageMPClientWebViewBridge,
       )
       ctx.bindSingleton(
         IPedAppearanceClient as InjectionToken<IPedAppearanceClient>,
