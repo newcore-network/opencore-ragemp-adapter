@@ -1,6 +1,6 @@
 import { injectable } from 'tsyringe'
-import { IPlayerServer, IdentifierTypes } from '@open-core/framework'
-import type { PlayerIdentifier } from '@open-core/framework'
+import { IPlayerServer } from '@open-core/framework/contracts/server'
+import { IdentifierTypes, type PlayerIdentifier } from '@open-core/framework/contracts'
 
 /**
  * Rage Multiplayer implementation of server-side player operations.

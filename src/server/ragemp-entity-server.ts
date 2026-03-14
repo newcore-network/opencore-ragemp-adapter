@@ -1,6 +1,6 @@
 import { injectable } from 'tsyringe'
-import { Vector3 } from '@open-core/framework'
-import { type EntityStateBag, IEntityServer, type SetPositionOptions } from '@open-core/framework'
+import { type EntityStateBag, IEntityServer, type SetPositionOptions } from '@open-core/framework/contracts/server'
+import { Vector3 } from '@open-core/framework/kernel'
 
 /**
  * RAGE Multiplayer implementation of server-side entity operations.

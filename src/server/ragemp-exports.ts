@@ -1,6 +1,6 @@
 import type { InjectionToken } from 'tsyringe'
 import { injectable, inject } from 'tsyringe'
-import { IExports, IResourceInfo } from '@open-core/framework'
+import { IExports, IResourceInfo } from '@open-core/framework/contracts/server'
 import { exportsRegistry } from '../shared/exports-registry'
 
 @injectable()

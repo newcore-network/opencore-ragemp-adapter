@@ -1,4 +1,5 @@
-import { IdentifierTypes, IPlatformContext } from '@open-core/framework'
+import { IdentifierTypes } from '@open-core/framework/contracts'
+import { IPlatformContext } from '@open-core/framework/contracts/server'
 import { injectable } from 'tsyringe'
 
 /**

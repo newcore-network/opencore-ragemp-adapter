@@ -1,5 +1,5 @@
 import { injectable } from 'tsyringe'
-import { IHasher } from '@open-core/framework'
+import { IHasher } from '@open-core/framework/contracts/server'
 
 /**
  * Rage Multiplayer implementation of hash utilities.

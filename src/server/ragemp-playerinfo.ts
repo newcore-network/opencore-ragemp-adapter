@@ -1,4 +1,5 @@
-import { Vector3, IPlayerInfo } from '@open-core/framework'
+import { IPlayerInfo } from '@open-core/framework/contracts/server'
+import { Vector3 } from '@open-core/framework/kernel'
 
 export class RageMPPlayerInfo implements IPlayerInfo {
   getPlayerName(clientId: number): string | null {

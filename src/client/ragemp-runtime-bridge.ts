@@ -1,5 +1,5 @@
 import { injectable } from 'tsyringe'
-import { IClientRuntimeBridge } from '@open-core/framework/client'
+import { IClientRuntimeBridge } from '@open-core/framework/contracts/client'
 import { exportsRegistry } from '../shared/exports-registry'
 import { KEYBOARD_KEY_MAP, MOUSE_KEY_MAP } from './key-maps'
 

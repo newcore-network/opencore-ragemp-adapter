@@ -1,7 +1,6 @@
 import { injectable } from 'tsyringe'
-import { IPedAppearanceClient } from '@open-core/framework/contracts'
+import { IClientPlatformBridge, IPedAppearanceClient } from '@open-core/framework/contracts/client'
 import type { Vector3 as CoreVector3 } from '@open-core/framework/kernel'
-import { IClientPlatformBridge } from '@open-core/framework/client'
 
 function getMp(): Mp {
   const runtime = (globalThis as { mp?: Mp }).mp
@@ -104,6 +103,10 @@ export class RageMPPedAppearanceClient extends IPedAppearanceClient {
 
 @injectable()
 export class RageMPPlatformBridge extends IClientPlatformBridge {
+  override getHashKey(value: string): number {
+    return getGame().joaat(value)
+  }
+
   override getLocalPlayerPed(): number {
     return getMp().players.local.handle ?? 0
   }

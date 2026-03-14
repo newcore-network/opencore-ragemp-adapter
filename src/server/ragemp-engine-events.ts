@@ -4,7 +4,7 @@ import {
   RUNTIME_EVENTS,
   type RuntimeEventMap,
   type RuntimeEventName,
-} from '@open-core/framework'
+} from '@open-core/framework/contracts/server'
 
 const EVENT_MAP: RuntimeEventMap = {
   ...DEFAULT_RUNTIME_EVENT_MAP,

@@ -1,18 +1,21 @@
 import type { InjectionToken } from 'tsyringe'
 import {
   defineClientAdapter,
+  type OpenCoreClientAdapter,
+} from '@open-core/framework/client'
+import {
   IClientLocalPlayerBridge,
   IClientPlatformBridge,
   IClientRuntimeBridge,
-  type OpenCoreClientAdapter,
-} from '@open-core/framework/client'
+  IPedAppearanceClient,
+} from '@open-core/framework/contracts/client'
 import { RageMPMessagingTransport } from '../shared/transport/adapter'
 import { enableRageMPNativeChat } from './native-chat'
 import { RageMPClientHasher } from './ragemp-hasher'
 import { RageMPLocalPlayerBridge } from './ragemp-local-player-bridge'
 import { RageMPPedAppearanceClient, RageMPPlatformBridge } from './ragemp-platform-bridge'
 import { RageMPRuntimeBridge } from './ragemp-runtime-bridge'
-import { IHasher, IPedAppearanceClient } from '@open-core/framework/contracts'
+import { IHasher } from '@open-core/framework/contracts'
 
 /**
  * Creates the external RAGE Multiplayer client adapter.

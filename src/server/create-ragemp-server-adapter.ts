@@ -22,7 +22,7 @@ import {
   IVehicleServer,
   IPlayerServer,
   IHasher,
-} from '@open-core/framework'
+} from '@open-core/framework/contracts/server'
 
 /**
  * Creates the external RAGE Multiplayer server adapter.

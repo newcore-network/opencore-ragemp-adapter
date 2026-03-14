@@ -1,5 +1,5 @@
 import { injectable } from 'tsyringe'
-import { IClientLocalPlayerBridge } from '@open-core/framework/client'
+import { IClientLocalPlayerBridge } from '@open-core/framework/contracts/client'
 import type { Vector3 } from '@open-core/framework/kernel'
 
 /**
