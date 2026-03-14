@@ -34,13 +34,14 @@ export class RageMPEntityServer extends IEntityServer {
   }
 
   getHeading(handle: number): number {
-    const player = mp.players.exists(handle) ? mp.players.at(handle) : undefined
-    return player?.heading ?? 0
+    const player = mp.players.at(handle)
+    return (player && mp.players.exists(player)) ? player.heading : 0
   }
 
   setHeading(handle: number, heading: number): void {
-    if (mp.players.exists(handle)) {
-      mp.players.at(handle).heading = heading
+    const player = mp.players.at(handle)
+    if (player && mp.players.exists(player)) {
+      player.heading = heading
     }
   }
 
@@ -78,35 +79,42 @@ export class RageMPEntityServer extends IEntityServer {
   }
 
   getHealth(handle: number): number {
-    if (mp.players.exists(handle)) return mp.players.at(handle).health
+    const player = mp.players.at(handle)
+    if (player && mp.players.exists(player)) return player.health
     return this.findEntity(handle)?.getVariable('health') ?? 200
   }
 
   setHealth(handle: number, health: number): void {
-    if (mp.players.exists(handle)) {
-      mp.players.at(handle).health = health
+    const player = mp.players.at(handle)
+    if (player && mp.players.exists(player)) {
+      player.health = health
       return
     }
     this.findEntity(handle)?.setVariable('health', health)
   }
 
   getArmor(handle: number): number {
-    if (mp.players.exists(handle)) return mp.players.at(handle).armour
+    const player = mp.players.at(handle)
+    if (player && mp.players.exists(player)) return player.armour
     return this.findEntity(handle)?.getVariable('armor') ?? 0
   }
 
   setArmor(handle: number, armor: number): void {
-    if (mp.players.exists(handle)) {
-      mp.players.at(handle).armour = armor
+    const player = mp.players.at(handle)
+    if (player && mp.players.exists(player)) {
+      player.armour = armor
       return
     }
     this.findEntity(handle)?.setVariable('armor', armor)
   }
 
   private findEntity(id: number): EntityMp | undefined {
-    if (mp.players.exists(id)) return mp.players.at(id)
-    if (mp.vehicles.exists(id)) return mp.vehicles.at(id)
-    if (mp.peds.exists(id)) return mp.peds.at(id)
+    const player = mp.players.at(id)
+    if (player && mp.players.exists(player)) return player
+    const vehicle = mp.vehicles.at(id)
+    if (vehicle && mp.vehicles.exists(vehicle)) return vehicle
+    const ped = mp.peds.at(id)
+    if (ped && mp.peds.exists(ped)) return ped
     return undefined
   }
 }

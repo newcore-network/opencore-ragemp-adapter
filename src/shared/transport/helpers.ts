@@ -8,8 +8,9 @@ import type { RuntimeContext } from '@open-core/framework/contracts'
  * addressable network targets in either FiveM or RageMP's emitNet.
  */
 function resolvePlayer(id: number): PlayerMp | undefined {
-  if (!mp.players.exists(id)) return undefined
-  return mp.players.at(id)
+  const player = mp.players.at(id)
+  if (player && mp.players.exists(player)) return player
+  return undefined
 }
 
 /**
