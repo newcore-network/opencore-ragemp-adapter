@@ -56,11 +56,7 @@ export class RageMPRuntimeBridge extends IClientRuntimeBridge {
     })
   }
 
-  registerCommand(
-    commandName: string,
-    handler: CommandHandler,
-    _restricted: boolean,
-  ): void {
+  registerCommand(commandName: string, handler: CommandHandler, _restricted: boolean): void {
     if (commandName.startsWith('+') || commandName.startsWith('-')) {
       this.commandHandlers.set(commandName, handler)
       return
