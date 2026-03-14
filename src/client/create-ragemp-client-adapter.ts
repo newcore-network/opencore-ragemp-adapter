@@ -7,6 +7,7 @@ import {
   type OpenCoreClientAdapter,
 } from '@open-core/framework/client'
 import { RageMPMessagingTransport } from '../shared/transport/adapter'
+import { enableRageMPNativeChat } from './native-chat'
 import { RageMPClientHasher } from './ragemp-hasher'
 import { RageMPLocalPlayerBridge } from './ragemp-local-player-bridge'
 import { RageMPPedAppearanceClient, RageMPPlatformBridge } from './ragemp-platform-bridge'
@@ -20,7 +21,9 @@ export function RageMPClientAdapter(): OpenCoreClientAdapter {
   return defineClientAdapter({
     name: 'ragemp',
     register(ctx) {
-      ctx.bindMessagingTransport(new RageMPMessagingTransport())
+      const transport = new RageMPMessagingTransport()
+      ctx.bindMessagingTransport(transport)
+      enableRageMPNativeChat(transport.events)
       ctx.bindSingleton(IHasher as InjectionToken<IHasher>, RageMPClientHasher)
       ctx.bindSingleton(
         IClientRuntimeBridge as InjectionToken<IClientRuntimeBridge>,
