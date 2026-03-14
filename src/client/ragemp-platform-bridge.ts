@@ -4,15 +4,11 @@ import type { Vector3 as CoreVector3 } from '@open-core/framework/kernel'
 import { loggers } from '@open-core/framework/kernel'
 
 function getMp(): Mp {
-  const runtime = (globalThis as { mp?: Mp }).mp
-  if (!runtime) {
-    throw new Error('RageMP client runtime `mp` is not available in this environment.')
-  }
-  return runtime
+  return mp
 }
 
 function getGame(): GameMp {
-  return getMp().game
+  return mp.game
 }
 
 function toMpVector3(position: CoreVector3): Vector3 {
@@ -55,18 +51,18 @@ function tryGetEntity(handle: number): EntityMp | undefined {
 
 @injectable()
 export class RageMPPedAppearanceClient extends IPedAppearanceClient {
-  setComponentVariation(): void {}
-  setPropIndex(): void {}
-  clearProp(): void {}
-  setDefaultComponentVariation(): void {}
-  setHeadBlendData(): void {}
-  setFaceFeature(): void {}
-  setHeadOverlay(): void {}
-  setHeadOverlayColor(): void {}
-  setHairColor(): void {}
-  setEyeColor(): void {}
-  addDecoration(): void {}
-  clearDecorations(): void {}
+  setComponentVariation(): void { }
+  setPropIndex(): void { }
+  clearProp(): void { }
+  setDefaultComponentVariation(): void { }
+  setHeadBlendData(): void { }
+  setFaceFeature(): void { }
+  setHeadOverlay(): void { }
+  setHeadOverlayColor(): void { }
+  setHairColor(): void { }
+  setEyeColor(): void { }
+  addDecoration(): void { }
+  clearDecorations(): void { }
   getDrawableVariation(): number {
     return 0
   }
@@ -345,7 +341,7 @@ export class RageMPPlatformBridge extends IClientPlatformBridge {
   override taskGoStraightToCoord(ped: number, position: CoreVector3, speed: number): void {
     tryGetPed(ped)?.taskGoStraightToCoord(position.x, position.y, position.z, speed, -1, 0, 0)
   }
-  override setPedCombatAttributes(): void {}
+  override setPedCombatAttributes(): void { }
   override createVehicle(
     modelHash: number,
     position: CoreVector3,
@@ -491,7 +487,7 @@ export class RageMPPlatformBridge extends IClientPlatformBridge {
   override setVehiclePetrolTankHealth(vehicle: number, health: number): void {
     getGame().vehicle.setPetrolTankHealth(vehicle, health)
   }
-  override setVehicleFuelLevel(_vehicle: number, _level: number): void {}
+  override setVehicleFuelLevel(_vehicle: number, _level: number): void { }
   override getVehicleFuelLevel(_vehicle: number): number {
     return 0
   }
@@ -536,6 +532,24 @@ export class RageMPPlatformBridge extends IClientPlatformBridge {
   override networkIsSessionStarted(): boolean {
     return this.playerReady
   }
+  override isScreenFadedOut(): boolean {
+    return getGame().cam.isScreenFadedOut()
+  }
+  override isScreenFadingOut(): boolean {
+    return getGame().cam.isScreenFadingOut()
+  }
+  override doScreenFadeOut(ms: number): void {
+    getGame().cam.doScreenFadeOut(ms)
+  }
+  override isScreenFadedIn(): boolean {
+    return getGame().cam.isScreenFadedIn()
+  }
+  override isScreenFadingIn(): boolean {
+    return getGame().cam.isScreenFadingIn()
+  }
+  override doScreenFadeIn(ms: number): void {
+    getGame().cam.doScreenFadeIn(ms)
+  }
   override networkResurrectLocalPlayer(position: CoreVector3, heading: number): void {
     getMp().players.local.position = toMpVector3(position)
     getMp().players.local.heading = heading
@@ -549,6 +563,11 @@ export class RageMPPlatformBridge extends IClientPlatformBridge {
   override requestCollisionAtCoord(position: CoreVector3): void {
     getGame().streaming.requestCollisionAtCoord(position.x, position.y, position.z)
   }
+  override shutdownLoadingScreen(): void {
+    getGame().script.setNoLoadingScreen(true)
+    getGame().script.shutdownLoadingScreen()
+  }
+  override shutdownLoadingScreenNui(): void { }
   override hasCollisionLoadedAroundEntity(_entity: number): boolean {
     return true
   }

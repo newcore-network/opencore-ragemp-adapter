@@ -6,6 +6,7 @@ import { RageMPEngineEvents } from './ragemp-engine-events'
 import { RageMPEntityServer } from './ragemp-entity-server'
 import { RageMPExports } from './ragemp-exports'
 import { RageMPHasher } from './ragemp-hasher'
+import { RageMPPlayerLifecycleServer } from './ragemp-player-lifecycle-server'
 import { RageMPPlayerInfo } from './ragemp-playerinfo'
 import { RageMPPlayerServer } from './ragemp-player-server'
 import { RageMPResourceInfo } from './ragemp-resourceinfo'
@@ -20,6 +21,7 @@ import {
   IPlayerInfo,
   IEntityServer,
   IVehicleServer,
+  IPlayerLifecycleServer,
   IPlayerServer,
   IHasher,
 } from '@open-core/framework/contracts/server'
@@ -40,6 +42,10 @@ export function RageMPServerAdapter(): OpenCoreServerAdapter {
       ctx.bindSingleton(IPlayerInfo as InjectionToken<IPlayerInfo>, RageMPPlayerInfo)
       ctx.bindSingleton(IEntityServer as InjectionToken<IEntityServer>, RageMPEntityServer)
       ctx.bindSingleton(IVehicleServer as InjectionToken<IVehicleServer>, RageMPVehicleServer)
+      ctx.bindSingleton(
+        IPlayerLifecycleServer as InjectionToken<IPlayerLifecycleServer>,
+        RageMPPlayerLifecycleServer,
+      )
       ctx.bindSingleton(IPlayerServer as InjectionToken<IPlayerServer>, RageMPPlayerServer)
       ctx.bindSingleton(IHasher as InjectionToken<IHasher>, RageMPHasher)
     },

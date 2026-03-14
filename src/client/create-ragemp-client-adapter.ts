@@ -7,6 +7,7 @@ import {
   IClientLogConsole,
   IClientLocalPlayerBridge,
   IClientPlatformBridge,
+  IClientSpawnBridge,
   IClientRuntimeBridge,
   IPedAppearanceClient,
 } from '@open-core/framework/contracts/client'
@@ -16,6 +17,7 @@ import { RageMPClientHasher } from './ragemp-hasher'
 import { installRageMPClientLogConsole, RageMPClientLogConsole } from './ragemp-log-console'
 import { RageMPLocalPlayerBridge } from './ragemp-local-player-bridge'
 import { RageMPPedAppearanceClient, RageMPPlatformBridge } from './ragemp-platform-bridge'
+import { RageMPClientSpawnBridge } from './ragemp-spawn-bridge'
 import { RageMPRuntimeBridge } from './ragemp-runtime-bridge'
 import { IHasher } from '@open-core/framework/contracts'
 
@@ -45,6 +47,10 @@ export function RageMPClientAdapter(): OpenCoreClientAdapter {
       ctx.bindSingleton(
         IClientPlatformBridge as InjectionToken<IClientPlatformBridge>,
         RageMPPlatformBridge,
+      )
+      ctx.bindSingleton(
+        IClientSpawnBridge as InjectionToken<IClientSpawnBridge>,
+        RageMPClientSpawnBridge,
       )
       ctx.bindSingleton(
         IPedAppearanceClient as InjectionToken<IPedAppearanceClient>,

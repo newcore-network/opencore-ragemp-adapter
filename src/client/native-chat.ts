@@ -25,9 +25,13 @@ function toHex(color: RGB): string {
 }
 
 function pushNativeChatLine(text: string, color: RGB): void {
-  mp.gui.chat.activate(true)
-  mp.gui.chat.show(true)
-  mp.gui.chat.push(`!{${toHex(color)}}${text}`)
+  try {
+    mp.gui.chat.activate(true)
+    mp.gui.chat.show(true)
+    mp.gui.chat.push(`!{${toHex(color)}}${text}`)
+  } catch {
+    // Ignore chat output when RageMP chat runtime is not ready yet.
+  }
 }
 
 function formatPayload(payload: ChatMessagePayload): { text: string; color: RGB } {

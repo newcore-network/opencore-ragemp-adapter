@@ -51,7 +51,17 @@ export class RageMPClientLogConsole extends IClientLogConsole {
   private write(method: 'logInfo' | 'logWarning' | 'logError', message: string, details?: unknown): void {
     const suffix = stringifyDetails(details)
     const output = suffix ? `${message} ${suffix}` : message
-    mp.console[method](output)
+    try {
+      mp.console[method](output)
+    } catch {
+      if (method === 'logError') {
+        console.error(output)
+      } else if (method === 'logWarning') {
+        console.warn(output)
+      } else {
+        console.info(output)
+      }
+    }
   }
 }
 
