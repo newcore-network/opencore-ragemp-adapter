@@ -6,11 +6,14 @@ import { RageMPEngineEvents } from './ragemp-engine-events'
 import { RageMPEntityServer } from './ragemp-entity-server'
 import { RageMPExports } from './ragemp-exports'
 import { RageMPHasher } from './ragemp-hasher'
+import { RageMPNpcLifecycleServer } from './ragemp-npc-lifecycle-server'
+import { RageMPPedServer } from './ragemp-ped-server'
 import { RageMPPlayerLifecycleServer } from './ragemp-player-lifecycle-server'
 import { RageMPPlayerInfo } from './ragemp-playerinfo'
 import { RageMPPlayerServer } from './ragemp-player-server'
 import { RageMPResourceInfo } from './ragemp-resourceinfo'
 import { RageMPTick } from './ragemp-tick'
+import { RageMPVehicleLifecycleServer } from './ragemp-vehicle-lifecycle-server'
 import { RageMPVehicleServer } from './ragemp-vehicle-server'
 import {
   IPlatformContext,
@@ -20,8 +23,11 @@ import {
   ITick,
   IPlayerInfo,
   IEntityServer,
+  INpcLifecycleServer,
+  IPedServer,
   IVehicleServer,
   IPlayerLifecycleServer,
+  IVehicleLifecycleServer,
   IPlayerServer,
   IHasher,
 } from '@open-core/framework/contracts/server'
@@ -41,7 +47,16 @@ export function RageMPServerAdapter(): OpenCoreServerAdapter {
       ctx.bindSingleton(ITick as InjectionToken<ITick>, RageMPTick)
       ctx.bindSingleton(IPlayerInfo as InjectionToken<IPlayerInfo>, RageMPPlayerInfo)
       ctx.bindSingleton(IEntityServer as InjectionToken<IEntityServer>, RageMPEntityServer)
+      ctx.bindSingleton(IPedServer as InjectionToken<IPedServer>, RageMPPedServer)
+      ctx.bindSingleton(
+        INpcLifecycleServer as InjectionToken<INpcLifecycleServer>,
+        RageMPNpcLifecycleServer,
+      )
       ctx.bindSingleton(IVehicleServer as InjectionToken<IVehicleServer>, RageMPVehicleServer)
+      ctx.bindSingleton(
+        IVehicleLifecycleServer as InjectionToken<IVehicleLifecycleServer>,
+        RageMPVehicleLifecycleServer,
+      )
       ctx.bindSingleton(
         IPlayerLifecycleServer as InjectionToken<IPlayerLifecycleServer>,
         RageMPPlayerLifecycleServer,
