@@ -4,6 +4,7 @@ import {
   type OpenCoreClientAdapter,
 } from '@open-core/framework/client'
 import {
+  IClientLogConsole,
   IClientLocalPlayerBridge,
   IClientPlatformBridge,
   IClientRuntimeBridge,
@@ -12,6 +13,7 @@ import {
 import { RageMPMessagingTransport } from '../shared/transport/adapter'
 import { enableRageMPNativeChat } from './native-chat'
 import { RageMPClientHasher } from './ragemp-hasher'
+import { installRageMPClientLogConsole, RageMPClientLogConsole } from './ragemp-log-console'
 import { RageMPLocalPlayerBridge } from './ragemp-local-player-bridge'
 import { RageMPPedAppearanceClient, RageMPPlatformBridge } from './ragemp-platform-bridge'
 import { RageMPRuntimeBridge } from './ragemp-runtime-bridge'
@@ -29,6 +31,10 @@ export function RageMPClientAdapter(): OpenCoreClientAdapter {
       enableRageMPNativeChat(transport.events)
       ctx.bindSingleton(IHasher as InjectionToken<IHasher>, RageMPClientHasher)
       ctx.bindSingleton(
+        IClientLogConsole as InjectionToken<IClientLogConsole>,
+        RageMPClientLogConsole,
+      )
+      ctx.bindSingleton(
         IClientRuntimeBridge as InjectionToken<IClientRuntimeBridge>,
         RageMPRuntimeBridge,
       )
@@ -44,6 +50,7 @@ export function RageMPClientAdapter(): OpenCoreClientAdapter {
         IPedAppearanceClient as InjectionToken<IPedAppearanceClient>,
         RageMPPedAppearanceClient,
       )
+      installRageMPClientLogConsole(new RageMPClientLogConsole())
     },
   })
 }

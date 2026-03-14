@@ -109,7 +109,7 @@ export class RageMPRuntimeBridge extends IClientRuntimeBridge {
   }
 
   getGameTimer(): number {
-    return mp.game.invoke('0xA4EA0691') as number
+    return mp.game.misc.getGameTimer()
   }
 
   registerNuiCallback(

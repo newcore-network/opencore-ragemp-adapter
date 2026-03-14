@@ -1,6 +1,7 @@
 import { injectable } from 'tsyringe'
 import { IClientPlatformBridge, IPedAppearanceClient } from '@open-core/framework/contracts/client'
 import type { Vector3 as CoreVector3 } from '@open-core/framework/kernel'
+import { loggers } from '@open-core/framework/kernel'
 
 function getMp(): Mp {
   const runtime = (globalThis as { mp?: Mp }).mp
@@ -103,6 +104,17 @@ export class RageMPPedAppearanceClient extends IPedAppearanceClient {
 
 @injectable()
 export class RageMPPlatformBridge extends IClientPlatformBridge {
+  private playerReady = false
+
+  constructor() {
+    super()
+
+    mp.events.add('playerReady', () => {
+      this.playerReady = true
+      loggers.spawn.debug('RageMP playerReady fired')
+    })
+  }
+
   override getHashKey(value: string): number {
     return getGame().joaat(value)
   }
@@ -522,7 +534,7 @@ export class RageMPPlatformBridge extends IClientPlatformBridge {
     getGame().ped.setArmour(ped, armour)
   }
   override networkIsSessionStarted(): boolean {
-    return true
+    return this.playerReady
   }
   override networkResurrectLocalPlayer(position: CoreVector3, heading: number): void {
     getMp().players.local.position = toMpVector3(position)
