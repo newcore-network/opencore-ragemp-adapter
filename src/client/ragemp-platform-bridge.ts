@@ -1,6 +1,7 @@
 import { injectable } from 'tsyringe'
 import { IClientPlatformBridge, IPedAppearanceClient } from '@open-core/framework/contracts/client'
 import type { Vector3 as CoreVector3 } from '@open-core/framework/kernel'
+import type { HeadBlendData } from '@open-core/framework/kernel'
 import { loggers } from '@open-core/framework/kernel'
 
 function getMp(): Mp {
@@ -51,50 +52,117 @@ function tryGetEntity(handle: number): EntityMp | undefined {
 
 @injectable()
 export class RageMPPedAppearanceClient extends IPedAppearanceClient {
-  setComponentVariation(): void { }
-  setPropIndex(): void { }
-  clearProp(): void { }
-  setDefaultComponentVariation(): void { }
-  setHeadBlendData(): void { }
-  setFaceFeature(): void { }
-  setHeadOverlay(): void { }
-  setHeadOverlayColor(): void { }
-  setHairColor(): void { }
-  setEyeColor(): void { }
-  addDecoration(): void { }
-  clearDecorations(): void { }
-  getDrawableVariation(): number {
-    return 0
+  setComponentVariation(ped: number, componentId: number, drawableId: number, textureId: number): void {
+    getGame().ped.setComponentVariation(ped, componentId, drawableId, textureId, 0)
   }
-  getTextureVariation(): number {
-    return 0
+
+  setPropIndex(ped: number, propId: number, drawableId: number, textureId: number): void {
+    getGame().ped.setPropIndex(ped, propId, drawableId, textureId, true)
   }
-  getPropIndex(): number {
-    return -1
+
+  clearProp(ped: number, propId: number): void {
+    getGame().ped.clearProp(ped, propId)
   }
-  getPropTextureIndex(): number {
-    return 0
+
+  setDefaultComponentVariation(ped: number): void {
+    getGame().ped.setDefaultComponentVariation(ped)
   }
-  getNumDrawableVariations(): number {
-    return 0
+
+  setHeadBlendData(
+    ped: number,
+    data: HeadBlendData,
+  ): void {
+    getGame().ped.setHeadBlendData(
+      ped,
+      data.shapeFirst,
+      data.shapeSecond,
+      data.shapeThird ?? 0,
+      data.skinFirst,
+      data.skinSecond,
+      data.skinThird ?? 0,
+      data.shapeMix,
+      data.skinMix,
+      data.thirdMix ?? 0,
+      false,
+    )
   }
-  getNumTextureVariations(): number {
-    return 0
+
+  setFaceFeature(ped: number, index: number, scale: number): void {
+    getGame().ped.setFaceFeature(ped, index, scale)
   }
-  getNumPropDrawableVariations(): number {
-    return 0
+
+  setHeadOverlay(ped: number, overlayId: number, index: number, opacity: number): void {
+    getGame().ped.setHeadOverlay(ped, overlayId, index, opacity)
   }
-  getNumPropTextureVariations(): number {
-    return 0
+
+  setHeadOverlayColor(
+    ped: number,
+    overlayId: number,
+    colorType: number,
+    colorId: number,
+    secondColorId: number,
+  ): void {
+    getGame().ped.setHeadOverlayColor(ped, overlayId, colorType, colorId, secondColorId)
   }
-  getNumOverlayValues(): number {
-    return 0
+
+  setHairColor(ped: number, colorId: number, highlightColorId: number): void {
+    getGame().ped.setHairColor(ped, colorId, highlightColorId)
   }
+
+  setEyeColor(ped: number, colorId: number): void {
+    getGame().ped.setEyeColor(ped, colorId)
+  }
+
+  addDecoration(ped: number, collectionHash: number, overlayHash: number): void {
+    getGame().ped.addDecorationFromHashes(ped, collectionHash, overlayHash)
+  }
+
+  clearDecorations(ped: number): void {
+    getGame().ped.clearDecorations(ped)
+  }
+
+  getDrawableVariation(ped: number, componentId: number): number {
+    return getGame().ped.getDrawableVariation(ped, componentId)
+  }
+
+  getTextureVariation(ped: number, componentId: number): number {
+    return getGame().ped.getTextureVariation(ped, componentId)
+  }
+
+  getPropIndex(ped: number, propId: number): number {
+    return getGame().ped.getPropIndex(ped, propId)
+  }
+
+  getPropTextureIndex(ped: number, propId: number): number {
+    return getGame().ped.getPropTextureIndex(ped, propId)
+  }
+
+  getNumDrawableVariations(ped: number, componentId: number): number {
+    return getGame().ped.getNumberOfDrawableVariations(ped, componentId)
+  }
+
+  getNumTextureVariations(ped: number, componentId: number, drawableId: number): number {
+    return getGame().ped.getNumberOfTextureVariations(ped, componentId, drawableId)
+  }
+
+  getNumPropDrawableVariations(ped: number, propId: number): number {
+    return getGame().ped.getNumberOfPropDrawableVariations(ped, propId)
+  }
+
+  getNumPropTextureVariations(ped: number, propId: number, drawableId: number): number {
+    return getGame().ped.getNumberOfPropTextureVariations(ped, propId, drawableId)
+  }
+
+  getNumOverlayValues(overlayId: number): number {
+    return getGame().ped.getNumHeadOverlayValues(overlayId)
+  }
+
   getNumHairColors(): number {
-    return 0
+    return getGame().ped.getNumHairColors()
   }
+
   getNumMakeupColors(): number {
-    return 0
+    return getGame().ped.getNumMakeupColors()
   }
 }
 

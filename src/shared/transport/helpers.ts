@@ -63,16 +63,16 @@ export function emitNet(
   }
 
   if (target === -1) {
-    mp.players.call(event, payload)
+    mp.players.call(event, ...payload)
     return
   }
 
   if (Array.isArray(target)) {
     for (const id of target) {
-      resolvePlayer(id)?.call(event, payload)
+      resolvePlayer(id)?.call(event, ...payload)
     }
     return
   }
 
-  resolvePlayer(target)?.call(event, payload)
+  resolvePlayer(target)?.call(event, ...payload)
 }

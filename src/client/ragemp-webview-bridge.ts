@@ -88,7 +88,7 @@ export class RageMPClientWebViewBridge extends IClientWebViewBridge {
   send(viewId: string, event: string, payload: unknown): void {
     const browser = this.views.get(viewId)
     if (!browser) return
-    browser.execute(`window.dispatchEvent(new CustomEvent('opencore:webview:message', { detail: { action: ${js(event)}, data: ${js(payload)} } }));`)
+    browser.execute(`window.postMessage({ __opencoreWebView: true, action: ${js(event)}, data: ${js(payload)} }, '*');`)
   }
   onMessage(handler: (message: WebViewMessage) => void | Promise<void>): () => void {
     this.ensureEventsRegistered()
