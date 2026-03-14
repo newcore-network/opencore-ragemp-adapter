@@ -1,4 +1,4 @@
-import { EventsAPI, type RuntimeContext } from '@open-core/framework'
+import { EventsAPI, type RuntimeContext } from '@open-core/framework/contracts'
 import { onNet, emitNet } from './helpers'
 
 function isPlayerTarget(value: unknown): value is { clientID: number } {

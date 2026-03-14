@@ -1,4 +1,4 @@
-import type { RuntimeContext } from '@open-core/framework'
+import type { RuntimeContext } from '@open-core/framework/contracts'
 
 /**
  * Resolves a player by numeric ID, returning undefined when the player no

@@ -1,5 +1,5 @@
-import type { EventsAPI } from '@open-core/framework'
-import type { RGB } from '@open-core/framework'
+import type { EventsAPI } from '@open-core/framework/contracts'
+import type { RGB } from '@open-core/framework/kernel'
 
 type NativeChatGlobal = typeof globalThis & {
   __OPENCORE_RAGEMP_NATIVE_CHAT_ENABLED__?: boolean

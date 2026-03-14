@@ -12,7 +12,7 @@ import { RageMPClientHasher } from './ragemp-hasher'
 import { RageMPLocalPlayerBridge } from './ragemp-local-player-bridge'
 import { RageMPPedAppearanceClient, RageMPPlatformBridge } from './ragemp-platform-bridge'
 import { RageMPRuntimeBridge } from './ragemp-runtime-bridge'
-import { IHasher, IPedAppearanceClient } from '@open-core/framework'
+import { IHasher, IPedAppearanceClient } from '@open-core/framework/contracts'
 
 /**
  * Creates the external RAGE Multiplayer client adapter.

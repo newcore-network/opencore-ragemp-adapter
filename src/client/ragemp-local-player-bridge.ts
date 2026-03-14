@@ -1,6 +1,6 @@
 import { injectable } from 'tsyringe'
 import { IClientLocalPlayerBridge } from '@open-core/framework/client'
-import { Vector3 } from '@open-core/framework'
+import type { Vector3 } from '@open-core/framework/kernel'
 
 /**
  * RAGE Multiplayer implementation of local player movement helpers.

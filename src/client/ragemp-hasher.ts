@@ -1,5 +1,5 @@
 import { injectable } from 'tsyringe'
-import { IHasher } from '@open-core/framework'
+import { IHasher } from '@open-core/framework/contracts'
 
 @injectable()
 export class RageMPClientHasher extends IHasher {

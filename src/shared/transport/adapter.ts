@@ -1,4 +1,4 @@
-import { MessagingTransport, type RuntimeContext } from '@open-core/framework'
+import { MessagingTransport, type RuntimeContext } from '@open-core/framework/contracts'
 import { RageMPEvents } from './ragemp.events'
 import { RageMPRpc } from './ragemp.rpc'
 

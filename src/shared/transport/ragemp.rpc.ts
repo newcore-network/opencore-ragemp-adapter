@@ -1,5 +1,4 @@
-import { RpcAPI, type RpcTarget } from '@open-core/framework'
-import type { RuntimeContext } from '@open-core/framework'
+import { RpcAPI, type RpcTarget, type RuntimeContext } from '@open-core/framework/contracts'
 import { onNet, emitNet } from './helpers'
 
 type RpcWireCall = {

@@ -1,5 +1,6 @@
 import { injectable } from 'tsyringe'
-import { IPedAppearanceClient, type Vector3 as CoreVector3 } from '@open-core/framework'
+import { IPedAppearanceClient } from '@open-core/framework/contracts'
+import type { Vector3 as CoreVector3 } from '@open-core/framework/kernel'
 import { IClientPlatformBridge } from '@open-core/framework/client'
 
 function getMp(): Mp {
