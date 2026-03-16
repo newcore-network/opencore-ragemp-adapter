@@ -1,5 +1,5 @@
 import { injectable } from 'tsyringe'
-import { IClientPlatformBridge, IPedAppearanceClient } from '@open-core/framework/contracts/client'
+import { IClientPlatformBridge, IGtaPedAppearanceBridge } from '@open-core/framework/contracts/client'
 import type { Vector3 as CoreVector3 } from '@open-core/framework/kernel'
 import type { HeadBlendData } from '@open-core/framework/kernel'
 import { loggers } from '@open-core/framework/kernel'
@@ -51,7 +51,7 @@ function tryGetEntity(handle: number): EntityMp | undefined {
 }
 
 @injectable()
-export class RageMPPedAppearanceClient extends IPedAppearanceClient {
+export class RageMPPedAppearanceClient extends IGtaPedAppearanceBridge {
   setComponentVariation(ped: number, componentId: number, drawableId: number, textureId: number): void {
     getGame().ped.setComponentVariation(ped, componentId, drawableId, textureId, 0)
   }

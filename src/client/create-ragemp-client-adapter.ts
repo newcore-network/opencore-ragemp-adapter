@@ -2,7 +2,6 @@ import type { InjectionToken } from 'tsyringe'
 import {
   defineClientAdapter,
   IClientWebViewBridge,
-  PlatformNotificationBridge,
   IClientLocalPlayerBridge,
   IClientPlatformBridge,
   IClientRuntimeBridge,
@@ -14,7 +13,7 @@ import {
   IClientMarkerBridge,
   IClientNotificationBridge,
   IClientSpawnBridge,
-  IPedAppearanceClient,
+  IGtaPedAppearanceBridge,
 } from '@open-core/framework/contracts/client'
 import { RageMPMessagingTransport } from '../shared/transport/adapter'
 import { enableRageMPNativeChat } from './native-chat'
@@ -23,6 +22,7 @@ import { installRageMPClientLogConsole, RageMPClientLogConsole } from './ragemp-
 import { RageMPLocalPlayerBridge } from './ragemp-local-player-bridge'
 import { RageMPClientBlipBridge } from './ragemp-blip-bridge'
 import { RageMPClientMarkerBridge } from './ragemp-marker-bridge'
+import { RageMPClientNotificationBridge } from './ragemp-notification-bridge'
 import { RageMPPedAppearanceClient, RageMPPlatformBridge } from './ragemp-platform-bridge'
 import { RageMPClientSpawnBridge } from './ragemp-spawn-bridge'
 import { RageMPRuntimeBridge } from './ragemp-runtime-bridge'
@@ -67,14 +67,14 @@ export function RageMPClientAdapter(): OpenCoreClientAdapter {
       )
       ctx.bindSingleton(
         IClientNotificationBridge as InjectionToken<IClientNotificationBridge>,
-        PlatformNotificationBridge,
+        RageMPClientNotificationBridge,
       )
       ctx.bindSingleton(
         IClientWebViewBridge as InjectionToken<IClientWebViewBridge>,
         RageMPClientWebViewBridge,
       )
       ctx.bindSingleton(
-        IPedAppearanceClient as InjectionToken<IPedAppearanceClient>,
+        IGtaPedAppearanceBridge as InjectionToken<IGtaPedAppearanceBridge>,
         RageMPPedAppearanceClient,
       )
       installRageMPClientLogConsole(new RageMPClientLogConsole())
