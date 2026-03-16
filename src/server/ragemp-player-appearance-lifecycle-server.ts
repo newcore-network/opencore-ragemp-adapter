@@ -1,6 +1,7 @@
 import { inject, injectable } from 'tsyringe'
 import { EventsAPI } from '@open-core/framework/contracts'
 import { Players } from '@open-core/framework/server'
+import { IPlayerServer } from '@open-core/framework/contracts/server'
 import { IPlayerAppearanceLifecycleServer } from '@open-core/framework/contracts/server'
 import type { PlayerAppearance } from '@open-core/framework'
 
@@ -9,6 +10,7 @@ export class RageMPPlayerAppearanceLifecycleServer extends IPlayerAppearanceLife
   constructor(
     @inject(EventsAPI as any) private readonly events: EventsAPI<'server'>,
     @inject(Players as any) private readonly players: Players,
+    @inject(IPlayerServer as any) private readonly playerServer: IPlayerServer,
   ) {
     super()
   }
@@ -20,6 +22,10 @@ export class RageMPPlayerAppearanceLifecycleServer extends IPlayerAppearanceLife
     const target = this.resolveTarget(playerSrc)
     if (!target) {
       return { success: false, errors: ['Player not found'] }
+    }
+
+    if (appearance.model) {
+      this.playerServer.setModel(playerSrc, appearance.model)
     }
 
     this.events.emit('opencore:appearance:apply', target, appearance)

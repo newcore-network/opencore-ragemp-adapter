@@ -50,6 +50,14 @@ function tryGetEntity(handle: number): EntityMp | undefined {
   }
 }
 
+function tryGetBlipByHandle(handle: number): BlipMp | undefined {
+  try {
+    return mp.blips.toArray().find((blip) => blip.handle === handle)
+  } catch {
+    return undefined
+  }
+}
+
 @injectable()
 export class RageMPPedAppearanceClient extends IPedAppearanceClient {
   setComponentVariation(ped: number, componentId: number, drawableId: number, textureId: number): void {
@@ -653,6 +661,154 @@ export class RageMPPlatformBridge extends IClientPlatformBridge {
   }
   override getVehicleNumberPlateText(vehicle: number): string {
     return getGame().vehicle.getNumberPlateText(vehicle)
+  }
+  override addBlipForCoord(position: CoreVector3): number {
+    const blip = mp.blips.new(1, toMpVector3(position))
+    return blip.handle
+  }
+  override addBlipForEntity(entity: number): number {
+    return getGame().ui.addBlipForEntity(entity)
+  }
+  override addBlipForRadius(position: CoreVector3, radius: number): number {
+    return getGame().ui.addBlipForRadius(position.x, position.y, position.z, radius)
+  }
+  override doesBlipExist(handle: number): boolean {
+    return getGame().ui.doesBlipExist(handle)
+  }
+  override removeBlip(handle: number): void {
+    getGame().ui.removeBlip(handle)
+    tryGetBlipByHandle(handle)?.destroy()
+  }
+  override setBlipCoords(handle: number, position: CoreVector3): void {
+    const blip = tryGetBlipByHandle(handle)
+    if (blip) {
+      blip.setCoords(toMpVector3(position))
+      return
+    }
+    getGame().ui.setBlipCoords(handle, position.x, position.y, position.z)
+  }
+  override setBlipRoute(handle: number, enabled: boolean): void {
+    const blip = tryGetBlipByHandle(handle)
+    if (blip) {
+      blip.setRoute(enabled)
+      return
+    }
+    getGame().ui.setBlipRoute(handle, enabled)
+  }
+  override setBlipRouteColour(handle: number, color: number): void {
+    const blip = tryGetBlipByHandle(handle)
+    if (blip) {
+      blip.setRouteColour(color)
+      return
+    }
+    getGame().ui.setBlipRouteColour(handle, color)
+  }
+  override setBlipSprite(handle: number, sprite: number): void {
+    const blip = tryGetBlipByHandle(handle)
+    if (blip) {
+      blip.setSprite(sprite)
+      return
+    }
+    getGame().ui.setBlipSprite(handle, sprite)
+  }
+  override setBlipColour(handle: number, color: number): void {
+    const blip = tryGetBlipByHandle(handle)
+    if (blip) {
+      blip.setColour(color)
+      return
+    }
+    getGame().ui.setBlipColour(handle, color)
+  }
+  override setBlipScale(handle: number, scale: number): void {
+    const blip = tryGetBlipByHandle(handle)
+    if (blip) {
+      blip.setScale(scale)
+      return
+    }
+    getGame().ui.setBlipScale(handle, scale)
+  }
+  override setBlipAsShortRange(handle: number, toggle: boolean): void {
+    const blip = tryGetBlipByHandle(handle)
+    if (blip) {
+      blip.setAsShortRange(toggle)
+      return
+    }
+    getGame().ui.setBlipAsShortRange(handle, toggle)
+  }
+  override setBlipDisplay(handle: number, displayId: number): void {
+    const blip = tryGetBlipByHandle(handle)
+    if (blip) {
+      blip.setDisplay(displayId)
+      return
+    }
+    getGame().ui.setBlipDisplay(handle, displayId)
+  }
+  override setBlipCategory(handle: number, index: number): void {
+    tryGetBlipByHandle(handle)?.setCategory(index)
+  }
+  override setBlipFlashes(handle: number, toggle: boolean): void {
+    const blip = tryGetBlipByHandle(handle)
+    if (blip) {
+      blip.setFlashes(toggle)
+      return
+    }
+    getGame().ui.setBlipFlashes(handle, toggle)
+  }
+  override setBlipAlpha(handle: number, alpha: number): void {
+    const blip = tryGetBlipByHandle(handle)
+    if (blip) {
+      blip.setAlpha(alpha)
+      return
+    }
+    getGame().ui.setBlipAlpha(handle, alpha)
+  }
+  override setBlipName(handle: number, label: string): void {
+    const blip = tryGetBlipByHandle(handle)
+    if (!blip) return
+  }
+  override drawMarker(options: {
+    type: number
+    position: CoreVector3
+    direction?: CoreVector3
+    rotation?: CoreVector3
+    scale: CoreVector3
+    color: { r: number; g: number; b: number; a: number }
+    bobUpAndDown: boolean
+    faceCamera: boolean
+    rotate: boolean
+    textureDict?: string
+    textureName?: string
+    drawOnEnts: boolean
+  }): void {
+    const direction = options.direction ?? { x: 0, y: 0, z: 0 }
+    const rotation = options.rotation ?? { x: 0, y: 0, z: 0 }
+
+    getGame().graphics.drawMarker(
+      options.type,
+      options.position.x,
+      options.position.y,
+      options.position.z,
+      direction.x,
+      direction.y,
+      direction.z,
+      rotation.x,
+      rotation.y,
+      rotation.z,
+      options.scale.x,
+      options.scale.y,
+      options.scale.z,
+      options.color.r,
+      options.color.g,
+      options.color.b,
+      options.color.a,
+      options.bobUpAndDown,
+      options.faceCamera,
+      2,
+      options.rotate,
+      options.textureDict ?? null,
+      options.textureName ?? null,
+      options.drawOnEnts,
+    )
   }
   override requestScriptAudioBank(_bank: string, _networked: boolean): boolean {
     return false
