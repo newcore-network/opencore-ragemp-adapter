@@ -2,8 +2,6 @@ import type { InjectionToken } from 'tsyringe'
 import {
   defineClientAdapter,
   IClientWebViewBridge,
-  PlatformBlipBridge,
-  PlatformMarkerBridge,
   PlatformNotificationBridge,
   IClientLocalPlayerBridge,
   IClientPlatformBridge,
@@ -23,6 +21,8 @@ import { enableRageMPNativeChat } from './native-chat'
 import { RageMPClientHasher } from './ragemp-hasher'
 import { installRageMPClientLogConsole, RageMPClientLogConsole } from './ragemp-log-console'
 import { RageMPLocalPlayerBridge } from './ragemp-local-player-bridge'
+import { RageMPClientBlipBridge } from './ragemp-blip-bridge'
+import { RageMPClientMarkerBridge } from './ragemp-marker-bridge'
 import { RageMPPedAppearanceClient, RageMPPlatformBridge } from './ragemp-platform-bridge'
 import { RageMPClientSpawnBridge } from './ragemp-spawn-bridge'
 import { RageMPRuntimeBridge } from './ragemp-runtime-bridge'
@@ -60,10 +60,10 @@ export function RageMPClientAdapter(): OpenCoreClientAdapter {
         IClientSpawnBridge as InjectionToken<IClientSpawnBridge>,
         RageMPClientSpawnBridge,
       )
-      ctx.bindSingleton(IClientBlipBridge as InjectionToken<IClientBlipBridge>, PlatformBlipBridge)
+      ctx.bindSingleton(IClientBlipBridge as InjectionToken<IClientBlipBridge>, RageMPClientBlipBridge)
       ctx.bindSingleton(
         IClientMarkerBridge as InjectionToken<IClientMarkerBridge>,
-        PlatformMarkerBridge,
+        RageMPClientMarkerBridge,
       )
       ctx.bindSingleton(
         IClientNotificationBridge as InjectionToken<IClientNotificationBridge>,
