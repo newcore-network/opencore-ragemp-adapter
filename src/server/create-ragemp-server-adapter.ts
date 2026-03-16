@@ -2,7 +2,7 @@ import type { InjectionToken } from 'tsyringe'
 import { defineServerAdapter, type OpenCoreServerAdapter } from '@open-core/framework/server'
 import { RageMPMessagingTransport } from '../shared/transport/adapter'
 import { RageMPPlatformContext } from './ragemp-capabilities'
-import { RageMPEngineEvents } from './ragemp-engine-events'
+import { resolveSharedEngineEvents } from './ragemp-engine-events'
 import { RageMPEntityServer } from './ragemp-entity-server'
 import { RageMPExports } from './ragemp-exports'
 import { RageMPHasher } from './ragemp-hasher'
@@ -45,7 +45,7 @@ export function RageMPServerAdapter(): OpenCoreServerAdapter {
     register(ctx) {
       ctx.bindMessagingTransport(new RageMPMessagingTransport())
       ctx.bindSingleton(IPlatformContext as InjectionToken<IPlatformContext>, RageMPPlatformContext)
-      ctx.bindSingleton(IEngineEvents as InjectionToken<IEngineEvents>, RageMPEngineEvents)
+      ctx.bindInstance(IEngineEvents as InjectionToken<IEngineEvents>, resolveSharedEngineEvents())
       ctx.bindSingleton(IExports as InjectionToken<IExports>, RageMPExports)
       ctx.bindSingleton(IResourceInfo as InjectionToken<IResourceInfo>, RageMPResourceInfo)
       ctx.bindSingleton(ITick as InjectionToken<ITick>, RageMPTick)
