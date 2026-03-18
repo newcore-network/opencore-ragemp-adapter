@@ -1,6 +1,6 @@
 {
   "name": "@open-core/ragemp-adapter",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "External Rage Multiplayer adapter for OpenCore framework.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -46,7 +46,7 @@
   "license": "MPL-2.0",
   "packageManager": "pnpm@10.13.1",
   "dependencies": {
-    "@open-core/framework": "file:../opencore-framework"
+    "@open-core/framework": "v1.0.5-beta.2"
   },
   "peerDependencies": {
     "reflect-metadata": "^0.2.2",
