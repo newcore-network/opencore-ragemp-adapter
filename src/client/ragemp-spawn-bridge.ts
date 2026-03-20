@@ -1,7 +1,8 @@
 import { inject, injectable } from 'tsyringe'
 import {
-  IClientSpawnBridge,
+  IClientSpawnPort,
   type RespawnRequest,
+  type SpawnExecutionResult,
   type SpawnRequest,
   type TeleportRequest,
 } from '@open-core/framework/contracts/client'
@@ -13,7 +14,7 @@ const PED_TIMEOUT_MS = 10_000
 const MODEL_LOAD_TIMEOUT_MS = 10_000
 
 @injectable()
-export class RageMPClientSpawnBridge extends IClientSpawnBridge {
+export class RageMPClientSpawnBridge extends IClientSpawnPort {
   private playerReady = false
 
   constructor(
@@ -37,18 +38,20 @@ export class RageMPClientSpawnBridge extends IClientSpawnBridge {
     }
   }
 
-  async spawn(request: SpawnRequest): Promise<void> {
+  async spawn(request: SpawnRequest): Promise<SpawnExecutionResult> {
     this.closeLoadingScreens()
     await this.setPlayerModel(request.model)
-    await this.ensurePed()
+    const ped = await this.ensurePed()
     mp.players.local.position = new mp.Vector3(request.position.x, request.position.y, request.position.z)
     mp.players.local.heading = request.heading ?? 0
+    return { localPlayerHandle: ped }
   }
 
-  async respawn(request: RespawnRequest): Promise<void> {
-    await this.ensurePed()
+  async respawn(request: RespawnRequest): Promise<SpawnExecutionResult> {
+    const ped = await this.ensurePed()
     mp.players.local.position = new mp.Vector3(request.position.x, request.position.y, request.position.z)
     mp.players.local.heading = request.heading ?? 0
+    return { localPlayerHandle: ped }
   }
 
   async teleport(request: TeleportRequest): Promise<void> {

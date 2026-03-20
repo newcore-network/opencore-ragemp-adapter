@@ -9,10 +9,15 @@ import {
 } from '@open-core/framework/client'
 import {
   IClientBlipBridge,
+  IClientCameraPort,
   IClientLogConsole,
   IClientMarkerBridge,
   IClientNotificationBridge,
+  IClientPedPort,
+  IClientProgressPort,
   IClientSpawnBridge,
+  IClientSpawnPort,
+  IClientVehiclePort,
   IGtaPedAppearanceBridge,
 } from '@open-core/framework/contracts/client'
 import { RageMPMessagingTransport } from '../shared/transport/adapter'
@@ -21,10 +26,14 @@ import { RageMPClientHasher } from './ragemp-hasher'
 import { installRageMPClientLogConsole, RageMPClientLogConsole } from './ragemp-log-console'
 import { RageMPLocalPlayerBridge } from './ragemp-local-player-bridge'
 import { RageMPClientBlipBridge } from './ragemp-blip-bridge'
+import { RageMPClientCameraPort } from './ragemp-camera-port'
 import { RageMPClientMarkerBridge } from './ragemp-marker-bridge'
 import { RageMPClientNotificationBridge } from './ragemp-notification-bridge'
+import { RageMPClientPedPort } from './ragemp-ped-port'
+import { RageMPClientProgressPort } from './ragemp-progress-port'
 import { RageMPPedAppearanceClient, RageMPPlatformBridge } from './ragemp-platform-bridge'
 import { RageMPClientSpawnBridge } from './ragemp-spawn-bridge'
+import { RageMPClientVehiclePort } from './ragemp-vehicle-port'
 import { RageMPRuntimeBridge } from './ragemp-runtime-bridge'
 import { RageMPClientWebViewBridge } from './ragemp-webview-bridge'
 import { IHasher } from '@open-core/framework/contracts'
@@ -56,9 +65,16 @@ export function RageMPClientAdapter(): OpenCoreClientAdapter {
         IClientPlatformBridge as InjectionToken<IClientPlatformBridge>,
         RageMPPlatformBridge,
       )
+      ctx.bindSingleton(IClientCameraPort as InjectionToken<IClientCameraPort>, RageMPClientCameraPort)
+      ctx.bindSingleton(IClientPedPort as InjectionToken<IClientPedPort>, RageMPClientPedPort)
+      ctx.bindSingleton(IClientProgressPort as InjectionToken<IClientProgressPort>, RageMPClientProgressPort)
       ctx.bindSingleton(
-        IClientSpawnBridge as InjectionToken<IClientSpawnBridge>,
+        IClientSpawnPort as InjectionToken<IClientSpawnPort>,
         RageMPClientSpawnBridge,
+      )
+      ctx.bindSingleton(IClientVehiclePort as InjectionToken<IClientVehiclePort>, RageMPClientVehiclePort)
+      ctx.bindFactory(IClientSpawnBridge as InjectionToken<IClientSpawnBridge>, () =>
+        ctx.container.resolve(IClientSpawnPort as InjectionToken<IClientSpawnPort>),
       )
       ctx.bindSingleton(IClientBlipBridge as InjectionToken<IClientBlipBridge>, RageMPClientBlipBridge)
       ctx.bindSingleton(

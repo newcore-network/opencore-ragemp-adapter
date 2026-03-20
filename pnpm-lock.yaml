@@ -8,9 +8,6 @@ importers:
 
   .:
     dependencies:
-      '@open-core/framework':
-        specifier: file:../opencore-framework
-        version: file:../opencore-framework(reflect-metadata@0.2.2)(tsyringe@4.10.0)(zod@4.3.6)
       reflect-metadata:
         specifier: ^0.2.2
         version: 0.2.2
@@ -24,6 +21,9 @@ importers:
       '@biomejs/biome':
         specifier: ^2.3.11
         version: 2.4.6
+      '@open-core/framework':
+        specifier: file:../opencore-framework
+        version: file:../opencore-framework(reflect-metadata@0.2.2)(tsyringe@4.10.0)(zod@4.3.6)
       '@ragempcommunity/types-client':
         specifier: ^2.1.9
         version: 2.1.9
