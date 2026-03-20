@@ -21,7 +21,6 @@ import {
   IGtaPedAppearanceBridge,
 } from '@open-core/framework/contracts/client'
 import { RageMPMessagingTransport } from '../shared/transport/adapter'
-import { enableRageMPNativeChat } from './native-chat'
 import { RageMPClientHasher } from './ragemp-hasher'
 import { installRageMPClientLogConsole, RageMPClientLogConsole } from './ragemp-log-console'
 import { RageMPLocalPlayerBridge } from './ragemp-local-player-bridge'
@@ -47,7 +46,6 @@ export function RageMPClientAdapter(): OpenCoreClientAdapter {
     register(ctx) {
       const transport = new RageMPMessagingTransport()
       ctx.bindMessagingTransport(transport)
-      enableRageMPNativeChat(transport.events)
       ctx.bindSingleton(IHasher as InjectionToken<IHasher>, RageMPClientHasher)
       ctx.bindSingleton(
         IClientLogConsole as InjectionToken<IClientLogConsole>,

@@ -3,9 +3,19 @@ import type { RGB } from '@open-core/framework/kernel'
 
 type NativeChatGlobal = typeof globalThis & {
   __OPENCORE_RAGEMP_NATIVE_CHAT_ENABLED__?: boolean
+  __OPENCORE_RAGEMP_NATIVE_CHAT_VISIBLE__?: boolean
+  __OPENCORE_RAGEMP_NATIVE_CHAT_SUPPRESSORS__?: Set<string>
 }
 
 const nativeChatGlobal: NativeChatGlobal = globalThis
+
+function getSuppressors(): Set<string> {
+  if (!nativeChatGlobal.__OPENCORE_RAGEMP_NATIVE_CHAT_SUPPRESSORS__) {
+    nativeChatGlobal.__OPENCORE_RAGEMP_NATIVE_CHAT_SUPPRESSORS__ = new Set<string>()
+  }
+
+  return nativeChatGlobal.__OPENCORE_RAGEMP_NATIVE_CHAT_SUPPRESSORS__
+}
 
 interface ChatMessagePayload {
   args?: readonly [string, string] | readonly string[]
@@ -25,13 +35,30 @@ function toHex(color: RGB): string {
 }
 
 function pushNativeChatLine(text: string, color: RGB): void {
+  if (nativeChatGlobal.__OPENCORE_RAGEMP_NATIVE_CHAT_VISIBLE__ === false) {
+    return
+  }
+
   try {
-    mp.gui.chat.activate(true)
-    mp.gui.chat.show(true)
     mp.gui.chat.push(`!{${toHex(color)}}${text}`)
   } catch {
     // Ignore chat output when RageMP chat runtime is not ready yet.
   }
+}
+
+function setNativeChatVisible(visible: boolean): void {
+  nativeChatGlobal.__OPENCORE_RAGEMP_NATIVE_CHAT_VISIBLE__ = visible
+
+  try {
+    mp.gui.chat.activate(false)
+    mp.gui.chat.show(visible)
+  } catch {
+    // Ignore when the chat runtime is not ready yet.
+  }
+}
+
+function syncNativeChatVisibility(): void {
+  setNativeChatVisible(getSuppressors().size === 0)
 }
 
 function formatPayload(payload: ChatMessagePayload): { text: string; color: RGB } {
@@ -42,9 +69,18 @@ function formatPayload(payload: ChatMessagePayload): { text: string; color: RGB 
   }
 }
 
+/**
+ * Optional native RageMP chat bridge.
+ *
+ * This is intentionally opt-in. Resources using a WebView chat should not
+ * enable it, otherwise the native chat UI can interfere with the custom one.
+ */
 export function enableRageMPNativeChat(events: EventsAPI<'client'>): void {
   if (nativeChatGlobal.__OPENCORE_RAGEMP_NATIVE_CHAT_ENABLED__) return
   nativeChatGlobal.__OPENCORE_RAGEMP_NATIVE_CHAT_ENABLED__ = true
+  if (nativeChatGlobal.__OPENCORE_RAGEMP_NATIVE_CHAT_VISIBLE__ === undefined) {
+    nativeChatGlobal.__OPENCORE_RAGEMP_NATIVE_CHAT_VISIBLE__ = true
+  }
 
   events.on('core:chat:addMessage', (_ctx, payload: ChatMessagePayload) => {
     const { text, color } = formatPayload(payload)
@@ -65,5 +101,38 @@ export function enableRageMPNativeChat(events: EventsAPI<'client'>): void {
 
   events.on('core:chat:clear', () => {
     // RageMP native chat has no public clear API.
+  })
+}
+
+export function disableRageMPNativeChatUi(): void {
+  getSuppressors().add('__manual__')
+  syncNativeChatVisibility()
+}
+
+export function enableRageMPNativeChatUi(): void {
+  getSuppressors().delete('__manual__')
+  syncNativeChatVisibility()
+}
+
+export function suppressRageMPNativeChat(source: string): void {
+  getSuppressors().add(source)
+  syncNativeChatVisibility()
+}
+
+export function releaseRageMPNativeChat(source: string): void {
+  getSuppressors().delete(source)
+  syncNativeChatVisibility()
+}
+
+if (typeof mp !== 'undefined') {
+  mp.events.add('render', () => {
+    if (nativeChatGlobal.__OPENCORE_RAGEMP_NATIVE_CHAT_VISIBLE__ === false) {
+      try {
+        mp.gui.chat.activate(false)
+        mp.gui.chat.show(false)
+      } catch {
+        // Ignore while chat runtime is unavailable.
+      }
+    }
   })
 }

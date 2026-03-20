@@ -45,7 +45,13 @@ type PendingEntry<TResult> = {
   timeout: ReturnType<typeof setTimeout>
 }
 
+declare const __OPENCORE_RESOURCE_NAME__: string | undefined
+
 function getCurrentResourceNameSafe(): string {
+  if (typeof __OPENCORE_RESOURCE_NAME__ === 'string' && __OPENCORE_RESOURCE_NAME__.trim()) {
+    return __OPENCORE_RESOURCE_NAME__
+  }
+
   if (typeof __dirname !== 'string') return 'default'
   const parts = __dirname.replace(/\\/g, '/').split('/')
   return parts[parts.length - 1] || 'default'

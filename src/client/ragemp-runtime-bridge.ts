@@ -7,6 +7,8 @@ type CommandHandler = (...args: readonly unknown[]) => void
 type RuntimeHandler = (...args: readonly unknown[]) => void | Promise<void>
 type RuntimeExport = (...args: readonly unknown[]) => unknown
 
+declare const __OPENCORE_RESOURCE_NAME__: string | undefined
+
 /**
  * RAGE Multiplayer implementation of the client runtime bridge.
  *
@@ -27,6 +29,10 @@ export class RageMPRuntimeBridge extends IClientRuntimeBridge {
   }
 
   getCurrentResourceName(): string {
+    if (typeof __OPENCORE_RESOURCE_NAME__ === 'string' && __OPENCORE_RESOURCE_NAME__.trim()) {
+      return __OPENCORE_RESOURCE_NAME__
+    }
+
     // RageMP does not provide an equivalent to FiveM's GetCurrentResourceName().
     // Client scripts are executed from the compiled bundle inside the resource
     // folder (usually under `client_packages/<resourceName>/...`).

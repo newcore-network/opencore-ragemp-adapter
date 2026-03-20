@@ -18,19 +18,9 @@ function isPlayerMp(value: unknown): value is PlayerMp {
   return typeof value === 'object' && value !== null && 'id' in value
 }
 
-// TODO: Refactor runtime event handling to use a single engine listener per event.
 // The listener should forward events to an internal dispatcher/event bus so that
 // multiple framework handlers do not register duplicate mp.events listeners.
 export class RageMPEngineEvents extends IEngineEvents {
-  constructor() {
-    super()
-    this.onRuntime(RUNTIME_EVENTS.playerCommand, (player: unknown, command: unknown) => {
-      if (!isPlayerMp(player) || typeof command !== 'string') return
-      const [commandName, ...args] = command.trim().split(/\s+/)
-      if (!commandName) return
-      this.emit('core:execute-command', player, commandName, args)
-    })
-  }
 
   override getRuntimeEventMap(): RuntimeEventMap {
     return EVENT_MAP

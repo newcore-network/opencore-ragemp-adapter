@@ -1,5 +1,33 @@
 import type { RuntimeContext } from '@open-core/framework/contracts'
 
+const JSON_WIRE_PREFIX = '__OPENCORE_JSON__:'
+
+function serializeWireValue(value: unknown): unknown {
+  if (value === null || value === undefined) return value
+
+  if (Array.isArray(value) || (typeof value === 'object' && value.constructor === Object)) {
+    return `${JSON_WIRE_PREFIX}${JSON.stringify(value)}`
+  }
+
+  return value
+}
+
+function deserializeWireValue<T>(value: T): T | unknown {
+  if (typeof value !== 'string' || !value.startsWith(JSON_WIRE_PREFIX)) {
+    return value
+  }
+
+  try {
+    return JSON.parse(value.slice(JSON_WIRE_PREFIX.length))
+  } catch {
+    return value
+  }
+}
+
+function deserializeWireArgs(args: any[]): any[] {
+  return args.map((arg) => deserializeWireValue(arg))
+}
+
 /**
  * Resolves a player by numeric ID, returning undefined when the player no
  * longer exists (disconnected, invalid handle, etc.).
@@ -33,10 +61,10 @@ export function onNet(
       // A 'playerQuit' event fires with the player still technically present;
       // all other events should be safe to guard this way.
       if (!mp.players.exists(player.id)) return
-      handler(player, ...args)
+      handler(player, ...deserializeWireArgs(args))
     })
   } else {
-    mp.events.add(event, (...args: any[]) => handler(undefined, ...args))
+    mp.events.add(event, (...args: any[]) => handler(undefined, ...deserializeWireArgs(args)))
   }
 }
 
@@ -58,22 +86,24 @@ export function emitNet(
   target: number | number[] | -1,
   ...payload: any[]
 ): void {
+  const serializedPayload = payload.map((item) => serializeWireValue(item))
+
   if (context !== 'server') {
-    mp.events.callRemote(event, ...payload)
+    mp.events.callRemote(event, ...serializedPayload)
     return
   }
 
   if (target === -1) {
-    mp.players.call(event, payload)
+    mp.players.call(event, serializedPayload)
     return
   }
 
   if (Array.isArray(target)) {
     for (const id of target) {
-      resolvePlayer(id)?.call(event, payload)
+      resolvePlayer(id)?.call(event, serializedPayload)
     }
     return
   }
 
-  resolvePlayer(target)?.call(event, payload)
+  resolvePlayer(target)?.call(event, serializedPayload)
 }
