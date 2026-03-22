@@ -432,7 +432,7 @@ export class RageMPPlatformBridge extends IClientPlatformBridge {
     tryGetEntity(vehicle)?.destroy()
   }
   override setVehicleOnGroundProperly(vehicle: number): void {
-    getMp().vehicles.atHandle(vehicle).setOnGroundProperly()
+    getGame().vehicle.setOnGroundProperly(vehicle, 0)
   }
   override getVehicleColours(vehicle: number): [number, number] {
     const colors = getGame().vehicle.getColours(vehicle)

@@ -9,7 +9,7 @@ import {
 } from '@open-core/framework/contracts/client'
 import type { Vector3 } from '@open-core/framework/kernel'
 
-function getCameraApi(): any {
+function getCameraApi(): GameCamMp {
   return (mp.game as any).cam
 }
 
@@ -25,15 +25,15 @@ export class RageMPClientCameraPort extends IClientCameraPort {
   }
 
   setActive(camera: number, active: boolean): void {
-    getCameraApi().setCamActive(camera, active)
+    getCameraApi().setActive(camera, active)
   }
 
   render(enable: boolean, options: ClientCameraRenderOptions = {}): void {
-    getCameraApi().renderScriptCams(enable, options.ease ?? false, options.easeTimeMs ?? 0, true, true)
+    getCameraApi().renderScriptCams(enable, options.ease ?? false, options.easeTimeMs ?? 0, true, true, 0)
   }
 
   destroy(camera: number, destroyActiveCamera = false): void {
-    getCameraApi().destroyCam(camera, destroyActiveCamera)
+    getCameraApi().destroy(camera, destroyActiveCamera)
   }
 
   destroyAll(destroyActiveCamera = false): void {
@@ -47,27 +47,27 @@ export class RageMPClientCameraPort extends IClientCameraPort {
   }
 
   setPosition(camera: number, position: Vector3): void {
-    getCameraApi().setCamCoord(camera, position.x, position.y, position.z)
+    getCameraApi().setCoord(camera, position.x, position.y, position.z)
   }
 
   setRotation(camera: number, rotation: ClientCameraRotation, rotationOrder = 2): void {
-    getCameraApi().setCamRot(camera, rotation.x, rotation.y, rotation.z, rotationOrder)
+    getCameraApi().setRot(camera, rotation.x, rotation.y, rotation.z, rotationOrder)
   }
 
   setFov(camera: number, fov: number): void {
-    getCameraApi().setCamFov(camera, fov)
+    getCameraApi().setFov(camera, fov)
   }
 
   pointAtCoords(camera: number, position: Vector3): void {
-    getCameraApi().pointCamAtCoord(camera, position.x, position.y, position.z)
+    getCameraApi().pointAtCoord(camera, position.x, position.y, position.z)
   }
 
   pointAtEntity(camera: number, entity: number, offset: Vector3 = { x: 0, y: 0, z: 0 }): void {
-    getCameraApi().pointCamAtEntity(camera, entity, offset.x, offset.y, offset.z, true)
+    getCameraApi().pointAtEntity(camera, entity, offset.x, offset.y, offset.z, true)
   }
 
   stopPointing(camera: number): void {
-    getCameraApi().stopCamPointing(camera)
+    getCameraApi().stopPointing(camera)
   }
 
   interpolate(
@@ -77,7 +77,7 @@ export class RageMPClientCameraPort extends IClientCameraPort {
     easeLocation = true,
     easeRotation = true,
   ): void {
-    getCameraApi().setCamActiveWithInterp(
+    getCameraApi().setActiveWithInterp(
       toCamera,
       fromCamera,
       durationMs,
@@ -87,10 +87,10 @@ export class RageMPClientCameraPort extends IClientCameraPort {
   }
 
   shake(camera: number, options: ClientCameraShakeOptions): void {
-    getCameraApi().shakeCam(camera, options.type, options.amplitude)
+    getCameraApi().shake(camera, options.type, options.amplitude)
   }
 
   stopShaking(camera: number, stopImmediately = true): void {
-    getCameraApi().stopCamShaking(camera, stopImmediately)
+    getCameraApi().stopShaking(camera, stopImmediately)
   }
 }
