@@ -50,9 +50,22 @@ export class RageMPEntityServer extends IEntityServer {
   }
 
   delete(handle: number): void {
+    const vehicle = mp.vehicles.at(handle)
+    if (vehicle && mp.vehicles.exists(vehicle) && typeof vehicle.destroy === 'function') {
+      vehicle.destroy()
+      return
+    }
+
+    const ped = mp.peds.at(handle)
+    if (ped && mp.peds.exists(ped) && typeof ped.destroy === 'function') {
+      ped.destroy()
+      return
+    }
+
     const entity = this.findEntity(handle)
-    if (!entity) return
-    entity.destroy()
+    if (entity && typeof entity.destroy === 'function') {
+      entity.destroy()
+    }
   }
 
   setOrphanMode(_handle: number, _mode: number): void {

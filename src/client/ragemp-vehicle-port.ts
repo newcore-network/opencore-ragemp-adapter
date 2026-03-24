@@ -199,10 +199,26 @@ export class RageMPClientVehiclePort extends IClientVehiclePort {
 
   getNetworkId(vehicle: number): number {
     if (!this.exists(vehicle)) return 0
+    mp.vehicles.atHandle(vehicle)
+    try {
+      const runtimeVehicle = mp.vehicles.atHandle(vehicle)
+      const remoteId = runtimeVehicle?.remoteId ?? runtimeVehicle?.id
+      if (typeof remoteId === 'number') return remoteId
+    } catch { }
+
     return this.platform.networkGetNetworkIdFromEntity(vehicle)
   }
 
   getFromNetworkId(networkId: number): number {
+    try {
+      const byRemoteId = mp.vehicles.atRemoteId(networkId)
+      if (byRemoteId?.handle) return byRemoteId.handle
+
+      const vehicles = mp.vehicles.toArray() ?? []
+      const match = vehicles.find((vehicle: any) => vehicle?.remoteId === networkId || vehicle?.id === networkId)
+      if (match?.handle) return match.handle
+    } catch { }
+
     if (!this.platform.networkDoesEntityExistWithNetworkId(networkId)) return 0
     return this.platform.networkGetEntityFromNetworkId(networkId)
   }
