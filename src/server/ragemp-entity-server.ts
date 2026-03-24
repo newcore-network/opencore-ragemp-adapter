@@ -50,7 +50,9 @@ export class RageMPEntityServer extends IEntityServer {
   }
 
   delete(handle: number): void {
-    this.findEntity(handle)?.destroy()
+    const entity = this.findEntity(handle)
+    if (!entity) return
+    entity.destroy()
   }
 
   setOrphanMode(_handle: number, _mode: number): void {
