@@ -19,7 +19,7 @@ export class RageMPEvents extends EventsAPI<RuntimeContext> {
     event: string,
     handler: (
       source: { clientId: number | undefined; raw: PlayerMp | undefined },
-      ...args: any[]
+      ...args: unknown[]
     ) => void,
   ): void {
     onNet(this.context, event, (source, ...args) => {
@@ -27,7 +27,7 @@ export class RageMPEvents extends EventsAPI<RuntimeContext> {
     })
   }
 
-  emit(event: string, ...args: any[]): void {
+  emit(event: string, ...args: unknown[]): void {
     // Client-side: always send to server; target is not used.
     if (this.context !== 'server') {
       emitNet(this.context, event, -1, ...args)
@@ -49,6 +49,8 @@ export class RageMPEvents extends EventsAPI<RuntimeContext> {
       emitNet(this.context, event, target.clientID, ...payload)
       return
     }
-    emitNet(this.context, event, target as number, ...payload)
+    if (typeof target === 'number') {
+      emitNet(this.context, event, target, ...payload)
+    }
   }
 }

@@ -1,4 +1,4 @@
-import { inject, injectable } from 'tsyringe'
+import { inject, injectable, type InjectionToken } from 'tsyringe'
 import { EventsAPI } from '@open-core/framework/contracts'
 import { Players } from '@open-core/framework/server'
 import { IPlayerServer } from '@open-core/framework/contracts/server'
@@ -8,9 +8,9 @@ import type { PlayerAppearance } from '@open-core/framework'
 @injectable()
 export class RageMPPlayerAppearanceLifecycleServer extends IPlayerAppearanceLifecycleServer {
   constructor(
-    @inject(EventsAPI as any) private readonly events: EventsAPI<'server'>,
-    @inject(Players as any) private readonly players: Players,
-    @inject(IPlayerServer as any) private readonly playerServer: IPlayerServer,
+    @inject(EventsAPI as InjectionToken<EventsAPI<'server'>>) private readonly events: EventsAPI<'server'>,
+    @inject(Players as InjectionToken<Players>) private readonly players: Players,
+    @inject(IPlayerServer as InjectionToken<IPlayerServer>) private readonly playerServer: IPlayerServer,
   ) {
     super()
   }

@@ -1,4 +1,4 @@
-import { inject, injectable } from 'tsyringe'
+import { inject, injectable, type InjectionToken } from 'tsyringe'
 import {
   type ClientPedAnimationOptions,
   type ClientPedSpawnOptions,
@@ -11,8 +11,10 @@ import type { Vector3 } from '@open-core/framework/kernel'
 @injectable()
 export class RageMPClientPedPort extends IClientPedPort {
   constructor(
-    @inject(IClientPlatformBridge as any) private readonly platform: IClientPlatformBridge,
-    @inject(IClientLocalPlayerBridge as any) private readonly localPlayer: IClientLocalPlayerBridge,
+    @inject(IClientPlatformBridge as InjectionToken<IClientPlatformBridge>)
+    private readonly platform: IClientPlatformBridge,
+    @inject(IClientLocalPlayerBridge as InjectionToken<IClientLocalPlayerBridge>)
+    private readonly localPlayer: IClientLocalPlayerBridge,
   ) {
     super()
   }

@@ -1,4 +1,4 @@
-import { inject, injectable } from 'tsyringe'
+import { inject, injectable, type InjectionToken } from 'tsyringe'
 import { IVehicleServer } from '@open-core/framework/contracts/server'
 import { IVehicleLifecycleServer } from '@open-core/framework/contracts/server'
 import type {
@@ -13,7 +13,7 @@ export class RageMPVehicleLifecycleServer extends IVehicleLifecycleServer {
     return seatIndex < 0 ? 0 : seatIndex + 1
   }
 
-  constructor(@inject(IVehicleServer as any) private readonly vehicleServer: IVehicleServer) {
+  constructor(@inject(IVehicleServer as InjectionToken<IVehicleServer>) private readonly vehicleServer: IVehicleServer) {
     super()
   }
 

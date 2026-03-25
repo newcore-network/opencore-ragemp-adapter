@@ -1,4 +1,4 @@
-import { inject, injectable } from 'tsyringe'
+import { inject, injectable, type InjectionToken } from 'tsyringe'
 import { IEntityServer, INpcLifecycleServer, IPedServer } from '@open-core/framework/contracts/server'
 import type {
   CreateNpcServerRequest,
@@ -9,8 +9,8 @@ import type {
 @injectable()
 export class RageMPNpcLifecycleServer extends INpcLifecycleServer {
   constructor(
-    @inject(IPedServer as any) private readonly pedServer: IPedServer,
-    @inject(IEntityServer as any) private readonly entityServer: IEntityServer,
+    @inject(IPedServer as InjectionToken<IPedServer>) private readonly pedServer: IPedServer,
+    @inject(IEntityServer as InjectionToken<IEntityServer>) private readonly entityServer: IEntityServer,
   ) {
     super()
   }

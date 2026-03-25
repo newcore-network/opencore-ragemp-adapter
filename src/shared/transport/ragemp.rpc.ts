@@ -1,4 +1,4 @@
-import { RpcAPI, type RpcTarget, type RuntimeContext } from '@open-core/framework/contracts'
+import { RpcAPI, type RpcContext, type RpcTarget, type RuntimeContext } from '@open-core/framework/contracts'
 import { onNet, emitNet } from './helpers'
 
 type RpcWireCall = {
@@ -39,10 +39,18 @@ type RpcWireAck = {
 
 type RpcWireMessage = RpcWireCall | RpcWireNotify | RpcWireResult | RpcWireError | RpcWireAck
 
-type PendingEntry<TResult> = {
-  resolve: (value: TResult) => void
+type PendingEntry = {
+  resolve: (value: unknown) => void
   reject: (reason?: unknown) => void
   timeout: ReturnType<typeof setTimeout>
+}
+
+function asErrorInfo(error: unknown): { message: string; name?: string } {
+  if (error instanceof Error) {
+    return { message: error.message, name: error.name }
+  }
+
+  return { message: String(error) }
 }
 
 declare const __OPENCORE_RESOURCE_NAME__: string | undefined
@@ -58,11 +66,11 @@ function getCurrentResourceNameSafe(): string {
 }
 
 export class RageMPRpc<C extends RuntimeContext = RuntimeContext> extends RpcAPI<C> {
-  private readonly pending = new Map<string, PendingEntry<unknown>>()
+  private readonly pending = new Map<string, PendingEntry>()
   private requestSeq = 0
   private readonly handlers = new Map<
     string,
-    (ctx: { requestId: string; clientId?: number; raw?: unknown }, ...args: any[]) => unknown
+    (ctx: RpcContext, ...args: unknown[]) => unknown
   >()
 
   private readonly channel = getCurrentResourceNameSafe()
@@ -83,22 +91,19 @@ export class RageMPRpc<C extends RuntimeContext = RuntimeContext> extends RpcAPI
     })
   }
 
-  on<TArgs extends any[], TResult>(
+  on<TArgs extends readonly unknown[], TResult>(
     name: string,
-    handler: (
-      ctx: { requestId: string; clientId?: number; raw?: unknown },
-      ...args: TArgs
-    ) => TResult | Promise<TResult>,
+    handler: (ctx: RpcContext, ...args: TArgs) => TResult | Promise<TResult>,
   ): void {
-    this.handlers.set(name, handler as any)
+    this.handlers.set(name, (ctx, ...args) => handler(ctx, ...(args as unknown as TArgs)))
   }
 
-  call<TResult = unknown>(name: string, ...args: any[]): Promise<TResult> {
+  call<TResult = unknown>(name: string, ...args: unknown[]): Promise<TResult> {
     const { target, payload } = this.normalizeInvocation(name, 'call', args)
     return this.sendAndWait<TResult>({ kind: 'call', name, args: payload }, target)
   }
 
-  notify(name: string, ...args: any[]): Promise<void> {
+  notify(name: string, ...args: unknown[]): Promise<void> {
     const { target, payload } = this.normalizeInvocation(name, 'notify', args)
     return this.sendAndWait<void>({ kind: 'notify', name, args: payload }, target)
   }
@@ -106,8 +111,8 @@ export class RageMPRpc<C extends RuntimeContext = RuntimeContext> extends RpcAPI
   private normalizeInvocation(
     name: string,
     kind: 'call' | 'notify',
-    args: any[],
-  ): { target?: RpcTarget; payload: any[] } {
+    args: unknown[],
+  ): { target?: RpcTarget; payload: unknown[] } {
     if (this.context === 'server') {
       if (args.length === 0) {
         throw new Error(`RageMPRpc: missing target for '${kind}' '${name}' in server context`)
@@ -158,7 +163,7 @@ export class RageMPRpc<C extends RuntimeContext = RuntimeContext> extends RpcAPI
         )
       }, this.defaultTimeoutMs)
 
-      this.pending.set(id, { resolve: resolve as any, reject, timeout })
+      this.pending.set(id, { resolve: (value) => resolve(value as TResult), reject, timeout })
 
       if (this.context === 'server') {
         const resolvedTarget = this.resolveServerTarget(target, input.kind, input.name)
@@ -222,7 +227,7 @@ export class RageMPRpc<C extends RuntimeContext = RuntimeContext> extends RpcAPI
             // raw is the PlayerMp object (analogous to FiveM's global.source).
             raw: source,
           },
-          ...(msg.args as any[]),
+          ...msg.args,
         ),
       )
 
@@ -231,7 +236,8 @@ export class RageMPRpc<C extends RuntimeContext = RuntimeContext> extends RpcAPI
       } else {
         this.emitResponse(replyTarget, { kind: 'result', id: msg.id, ok: true, result })
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
+      const errorInfo = asErrorInfo(err)
       if (msg.kind === 'notify') {
         this.emitResponse(replyTarget, { kind: 'ack', id: msg.id })
         return
@@ -242,8 +248,8 @@ export class RageMPRpc<C extends RuntimeContext = RuntimeContext> extends RpcAPI
         id: msg.id,
         ok: false,
         error: {
-          message: err?.message ? String(err.message) : String(err),
-          name: err?.name ? String(err.name) : undefined,
+          message: errorInfo.message,
+          name: errorInfo.name,
         },
       })
     }
@@ -269,7 +275,13 @@ export class RageMPRpc<C extends RuntimeContext = RuntimeContext> extends RpcAPI
     }
 
     const error = new Error(msg.error?.message ?? 'RageMPRpc: remote error')
-    ;(error as any).name = msg.error?.name ?? error.name
+    if (msg.error?.name) {
+      Object.defineProperty(error, 'name', {
+        value: msg.error.name,
+        configurable: true,
+        writable: true,
+      })
+    }
     pending.reject(error)
   }
 

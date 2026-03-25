@@ -10,7 +10,7 @@ import {
 import type { Vector3 } from '@open-core/framework/kernel'
 
 function getCameraApi(): GameCamMp {
-  return (mp.game as any).cam
+  return mp.game.cam
 }
 
 @injectable()

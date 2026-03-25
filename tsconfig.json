@@ -16,6 +16,7 @@
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "baseUrl": ".",
+    "ignoreDeprecations": "6.0",
     "types": ["@types/node"],
     "composite": true,
     "declaration": true,

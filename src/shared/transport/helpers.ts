@@ -24,7 +24,7 @@ function deserializeWireValue<T>(value: T): T | unknown {
   }
 }
 
-function deserializeWireArgs(args: any[]): any[] {
+function deserializeWireArgs(args: readonly unknown[]): unknown[] {
   return args.map((arg) => deserializeWireValue(arg))
 }
 
@@ -47,24 +47,26 @@ function resolvePlayer(id: number): PlayerMp | undefined {
  *
  * Analogous to FiveM's `onNet`:
  * - Server: RageMP prepends the PlayerMp as the first native argument.
- *   We expose it as-is so callers can read player.id before any await.
+ *   We expose it as-is so callers can read player.id before awaiting.
  * - Client: no source argument; we pass undefined to keep the signature uniform.
  */
-export function onNet(
+export function onNet<TArgs extends readonly unknown[]>(
   context: RuntimeContext,
   event: string,
-  handler: (source: PlayerMp | undefined, ...args: any[]) => void,
+  handler: (source: PlayerMp | undefined, ...args: TArgs) => void,
 ): void {
   if (context === 'server') {
-    mp.events.add(event, (player: PlayerMp, ...args: any[]) => {
+    mp.events.add(event, (player: PlayerMp, ...args: unknown[]) => {
       // Validate the player is still connected before forwarding.
       // A 'playerQuit' event fires with the player still technically present;
       // all other events should be safe to guard this way.
       if (!mp.players.exists(player.id)) return
-      handler(player, ...deserializeWireArgs(args))
+      handler(player, ...(deserializeWireArgs(args) as unknown as TArgs))
     })
   } else {
-    mp.events.add(event, (...args: any[]) => handler(undefined, ...deserializeWireArgs(args)))
+    mp.events.add(event, (...args: unknown[]) => {
+      handler(undefined, ...(deserializeWireArgs(args) as unknown as TArgs))
+    })
   }
 }
 
@@ -84,7 +86,7 @@ export function emitNet(
   context: RuntimeContext,
   event: string,
   target: number | number[] | -1,
-  ...payload: any[]
+  ...payload: unknown[]
 ): void {
   const serializedPayload = payload.map((item) => serializeWireValue(item))
 
