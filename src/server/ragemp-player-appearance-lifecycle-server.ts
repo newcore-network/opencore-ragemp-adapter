@@ -1,5 +1,6 @@
 import { inject, injectable, type InjectionToken } from 'tsyringe'
 import { EventsAPI } from '@open-core/framework/contracts'
+import { SYSTEM_EVENTS } from '@open-core/framework'
 import { Players } from '@open-core/framework/server'
 import { IPlayerServer } from '@open-core/framework/contracts/server'
 import { IPlayerAppearanceLifecycleServer } from '@open-core/framework/contracts/server'
@@ -28,7 +29,7 @@ export class RageMPPlayerAppearanceLifecycleServer extends IPlayerAppearanceLife
       this.playerServer.setModel(playerSrc, appearance.model)
     }
 
-    this.events.emit('opencore:appearance:apply', target, appearance)
+    this.events.emit(SYSTEM_EVENTS.appearance.apply, target, appearance)
     return { success: true, appearance }
   }
 
@@ -38,14 +39,14 @@ export class RageMPPlayerAppearanceLifecycleServer extends IPlayerAppearanceLife
   ): boolean {
     const target = this.resolveTarget(playerSrc)
     if (!target) return false
-    this.events.emit('opencore:appearance:apply', target, appearance)
+    this.events.emit(SYSTEM_EVENTS.appearance.apply, target, appearance)
     return true
   }
 
   reset(playerSrc: string): boolean {
     const target = this.resolveTarget(playerSrc)
     if (!target) return false
-    this.events.emit('opencore:appearance:reset', target)
+    this.events.emit(SYSTEM_EVENTS.appearance.reset, target)
     return true
   }
 

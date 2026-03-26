@@ -1,4 +1,5 @@
 import type { EventsAPI } from '@open-core/framework/contracts'
+import { SYSTEM_EVENTS } from '@open-core/framework'
 import type { RGB } from '@open-core/framework/kernel'
 
 type NativeChatGlobal = typeof globalThis & {
@@ -82,24 +83,24 @@ export function enableRageMPNativeChat(events: EventsAPI<'client'>): void {
     nativeChatGlobal.__OPENCORE_RAGEMP_NATIVE_CHAT_VISIBLE__ = true
   }
 
-  events.on('core:chat:addMessage', (_ctx, payload: ChatMessagePayload) => {
+  events.on(SYSTEM_EVENTS.chat.addMessage, (_ctx, payload: ChatMessagePayload) => {
     const { text, color } = formatPayload(payload)
     pushNativeChatLine(text, color)
   })
 
-  events.on('core:chat:message', (_ctx, payload: ChatMessagePayload) => {
+  events.on(SYSTEM_EVENTS.chat.message, (_ctx, payload: ChatMessagePayload) => {
     const { text, color } = formatPayload(payload)
     pushNativeChatLine(text, color)
   })
 
   events.on(
-    'core:chat:send',
+    SYSTEM_EVENTS.chat.send,
     (_ctx, message: string, type: 'chat' | 'error' | 'success' | 'warning' = 'chat') => {
       pushNativeChatLine(message, CHAT_TYPE_COLORS[type] ?? CHAT_TYPE_COLORS.chat)
     },
   )
 
-  events.on('core:chat:clear', () => {
+  events.on(SYSTEM_EVENTS.chat.clear, () => {
     // RageMP native chat has no public clear API.
   })
 }

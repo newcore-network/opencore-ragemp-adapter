@@ -55,7 +55,7 @@
   },
   "devDependencies": {
     "@biomejs/biome": "^2.4.8",
-    "@open-core/framework": "file:../opencore-framework",
+    "@open-core/framework": "latest",
     "@ragempcommunity/types-client": "^2.1.9",
     "@ragempcommunity/types-server": "^2.1.9",
     "@types/node": "^25.5.0",
