@@ -15,15 +15,18 @@ export class RageMPEvents extends EventsAPI<RuntimeContext> {
     super()
   }
 
-  on(
+  on<TArgs extends readonly unknown[]>(
     event: string,
     handler: (
       source: { clientId: number | undefined; raw: PlayerMp | undefined },
-      ...args: unknown[]
-    ) => void,
+      ...args: TArgs
+    ) => void | Promise<void>,
   ): void {
     onNet(this.context, event, (source, ...args) => {
-      handler({ clientId: source?.id, raw: source }, ...args)
+      void handler(
+        { clientId: source?.id, raw: source },
+        ...(args as unknown as TArgs),
+      )
     })
   }
 

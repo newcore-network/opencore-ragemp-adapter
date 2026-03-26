@@ -17,7 +17,11 @@ export class ExportsRegistry {
   private readonly registry = new Map<string, Map<string, ExportHandler>>()
   private readonly namespaceProxyCache = new Map<string, NamespaceProxy>()
 
-  register(resource: string, name: string, handler: ExportHandler): void {
+  register<TArgs extends readonly unknown[], TResult = unknown>(
+    resource: string,
+    name: string,
+    handler: (...args: TArgs) => TResult,
+  ): void {
     let namespace = this.registry.get(resource)
 
     if (!namespace) {
@@ -29,7 +33,7 @@ export class ExportsRegistry {
       throw new Error(`[exports] Export "${name}" already registered in "${resource}".`)
     }
 
-    namespace.set(name, handler)
+    namespace.set(name, handler as ExportHandler)
   }
 
   call(resource: string, name: string, ...args: ExportArgs): unknown {
@@ -107,7 +111,11 @@ function resolveSharedRegistry(): ExportsRegistry {
 
 export const exportsRegistry = resolveSharedRegistry()
 
-export function registerExport(resource: string, name: string, handler: ExportHandler): void {
+export function registerExport<TArgs extends readonly unknown[], TResult = unknown>(
+  resource: string,
+  name: string,
+  handler: (...args: TArgs) => TResult,
+): void {
   exportsRegistry.register(resource, name, handler)
 }
 

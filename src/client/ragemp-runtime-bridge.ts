@@ -4,8 +4,6 @@ import { exportsRegistry } from '../shared/exports-registry'
 import { KEYBOARD_KEY_MAP, MOUSE_KEY_MAP } from './key-maps'
 
 type CommandHandler = (...args: readonly unknown[]) => void
-type RuntimeHandler = (...args: readonly unknown[]) => void | Promise<void>
-type RuntimeExport = (...args: readonly unknown[]) => unknown
 
 declare const __OPENCORE_RESOURCE_NAME__: string | undefined
 
@@ -56,9 +54,12 @@ export class RageMPRuntimeBridge extends IClientRuntimeBridge {
     return parts[parts.length - 1] || 'default'
   }
 
-  on(eventName: string, handler: RuntimeHandler): void {
+  on<TArgs extends readonly unknown[]>(
+    eventName: string,
+    handler: (...args: TArgs) => void | Promise<void>,
+  ): void {
     mp.events.add(eventName, (...args: unknown[]) => {
-      void handler(...args)
+      void handler(...(args as unknown as TArgs))
     })
   }
 
@@ -137,7 +138,10 @@ export class RageMPRuntimeBridge extends IClientRuntimeBridge {
     // TODO: Still looking for a good way to implement this.
   }
 
-  registerExport(exportName: string, handler: RuntimeExport): void {
+  registerExport<TArgs extends readonly unknown[], TResult = unknown>(
+    exportName: string,
+    handler: (...args: TArgs) => TResult,
+  ): void {
     exportsRegistry.register(this.getCurrentResourceName(), exportName, handler)
   }
 }

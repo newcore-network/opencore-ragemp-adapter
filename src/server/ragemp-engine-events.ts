@@ -12,8 +12,6 @@ const EVENT_MAP: RuntimeEventMap = {
   [RUNTIME_EVENTS.playerDropped]: 'playerQuit',
 }
 
-type EngineHandler = (...args: readonly unknown[]) => void
-
 function isPlayerMp(value: unknown): value is PlayerMp {
   return typeof value === 'object' && value !== null && 'id' in value
 }
@@ -26,7 +24,10 @@ export class RageMPEngineEvents extends IEngineEvents {
     return EVENT_MAP
   }
 
-  override onRuntime(eventName: RuntimeEventName, handler?: EngineHandler): void {
+  override onRuntime<TArgs extends readonly unknown[]>(
+    eventName: RuntimeEventName,
+    handler?: (...args: TArgs) => void,
+  ): void {
     if (!handler) return
 
     const mpEvent = this.getRuntimeEventMap()[eventName] ?? eventName
@@ -35,23 +36,23 @@ export class RageMPEngineEvents extends IEngineEvents {
       const license = player.rgscId
 
       if (eventName === RUNTIME_EVENTS.playerJoining) {
-        handler(player.id, { license })
+        handler(...([player.id, { license }] as unknown as TArgs))
         return
       }
 
       if (eventName === RUNTIME_EVENTS.playerDropped) {
-        handler(player.id)
+        handler(...([player.id] as unknown as TArgs))
         return
       }
 
-      handler(player, ...args)
+      handler(...([player, ...args] as unknown as TArgs))
     })
   }
 
-  on(eventName: string, handler?: EngineHandler): void {
+  on<TArgs extends readonly unknown[]>(eventName: string, handler?: (...args: TArgs) => void): void {
     if (!handler) return
     mp.events.add(eventName, (...args: unknown[]) => {
-      handler(...args)
+      handler(...(args as unknown as TArgs))
     })
   }
 
