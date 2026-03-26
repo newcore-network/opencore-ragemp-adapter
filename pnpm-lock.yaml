@@ -22,8 +22,8 @@ importers:
         specifier: ^2.4.8
         version: 2.4.8
       '@open-core/framework':
-        specifier: file:../opencore-framework
-        version: file:../opencore-framework(reflect-metadata@0.2.2)(tsyringe@4.10.0)(zod@4.3.6)
+        specifier: latest
+        version: 1.0.5(reflect-metadata@0.2.2)(tsyringe@4.10.0)(zod@4.3.6)
       '@ragempcommunity/types-client':
         specifier: ^2.1.9
         version: 2.1.9
@@ -92,8 +92,8 @@ packages:
     cpu: [x64]
     os: [win32]
 
-  '@open-core/framework@file:../opencore-framework':
-    resolution: {directory: ../opencore-framework, type: directory}
+  '@open-core/framework@1.0.5':
+    resolution: {integrity: sha512-BbAwFDYi3w/dfDPP/nmH+4Ub0YCsuQbikTWX/qzDpaKeJjamtR1jQrM0c5bnqihsfSav5EZ1zoUi7A9fIxTV8Q==}
     peerDependencies:
       reflect-metadata: ^0.2.2
       tsyringe: ^4.10.0
@@ -170,7 +170,7 @@ snapshots:
   '@biomejs/cli-win32-x64@2.4.8':
     optional: true
 
-  '@open-core/framework@file:../opencore-framework(reflect-metadata@0.2.2)(tsyringe@4.10.0)(zod@4.3.6)':
+  '@open-core/framework@1.0.5(reflect-metadata@0.2.2)(tsyringe@4.10.0)(zod@4.3.6)':
     dependencies:
       reflect-metadata: 0.2.2
       tsyringe: 4.10.0
