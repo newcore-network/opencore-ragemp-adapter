@@ -45,12 +45,22 @@ type PendingEntry = {
   timeout: ReturnType<typeof setTimeout>
 }
 
-function asErrorInfo(error: unknown): { message: string; name?: string } {
-  if (error instanceof Error) {
-    return { message: error.message, name: error.name }
+function serializeRpcError(error: unknown): { message: string; name?: string } {
+  if (
+    typeof error === 'object' &&
+    error !== null &&
+    'message' in error &&
+    typeof error.message === 'string' &&
+    'expose' in error &&
+    error.expose === true
+  ) {
+    return {
+      message: error.message,
+      name: 'name' in error && typeof error.name === 'string' ? error.name : undefined,
+    }
   }
 
-  return { message: String(error) }
+  return { message: 'An internal server error occurred' }
 }
 
 declare const __OPENCORE_RESOURCE_NAME__: string | undefined
@@ -237,7 +247,7 @@ export class RageMPRpc<C extends RuntimeContext = RuntimeContext> extends RpcAPI
         this.emitResponse(replyTarget, { kind: 'result', id: msg.id, ok: true, result })
       }
     } catch (err: unknown) {
-      const errorInfo = asErrorInfo(err)
+      const errorInfo = serializeRpcError(err)
       if (msg.kind === 'notify') {
         this.emitResponse(replyTarget, { kind: 'ack', id: msg.id })
         return
