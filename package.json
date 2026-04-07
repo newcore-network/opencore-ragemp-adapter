@@ -1,6 +1,6 @@
 {
   "name": "@open-core/ragemp-adapter",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "External Rage Multiplayer adapter for OpenCore framework.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
