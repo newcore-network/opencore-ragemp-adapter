@@ -17,7 +17,9 @@
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "types": [
-      "@types/node"
+      "@types/node",
+      "@ragempcommunity/types-server",
+      "@ragempcommunity/types-client"
     ],
     "composite": true,
     "declaration": true,
@@ -26,7 +28,7 @@
     "noEmitOnError": true,
     "rootDir": "./src",
     "outDir": "./dist",
-    "tsBuildInfoFile": "./dist/.tsbuildinfo/root.tsbuildinfo"
+    "tsBuildInfoFile": "./dist/.tsbuildinfo/root.tsbuildinfo",
   },
   "include": [
     "src/index.ts"
