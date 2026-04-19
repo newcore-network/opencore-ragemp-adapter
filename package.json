@@ -60,11 +60,11 @@
     "zod": "^4.3.5"
   },
   "devDependencies": {
-    "@biomejs/biome": "^2.4.10",
-    "@open-core/framework": "^1.0.11",
+    "@biomejs/biome": "^2.4.12",
+    "@open-core/framework": "^1.0.12",
     "@ragempcommunity/types-client": "^2.1.9",
     "@ragempcommunity/types-server": "^2.1.9",
-    "@types/node": "^25.5.0",
-    "typescript": "^6.0.2"
+    "@types/node": "^25.6.0",
+    "typescript": "^6.0.3"
   }
 }
