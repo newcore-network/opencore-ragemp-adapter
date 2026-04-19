@@ -2,9 +2,10 @@
   "$schema": "https://www.schemastore.org/tsconfig",
   "display": "Node 16 + Project References",
   "_version": "16.0.0",
-
   "compilerOptions": {
-    "lib": ["es2020"],
+    "lib": [
+      "es2020"
+    ],
     "target": "es2020",
     "module": "node16",
     "moduleResolution": "node16",
@@ -15,9 +16,9 @@
     "noImplicitAny": true,
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
-    "baseUrl": ".",
-    "ignoreDeprecations": "6.0",
-    "types": ["@types/node"],
+    "types": [
+      "@types/node"
+    ],
     "composite": true,
     "declaration": true,
     "declarationMap": false,
@@ -27,8 +28,13 @@
     "outDir": "./dist",
     "tsBuildInfoFile": "./dist/.tsbuildinfo/root.tsbuildinfo"
   },
-  "include": ["src/index.ts"],
-  "exclude": ["dist", "node_modules"],
+  "include": [
+    "src/index.ts"
+  ],
+  "exclude": [
+    "dist",
+    "node_modules"
+  ],
   "references": [
     {
       "path": "./src/shared"
