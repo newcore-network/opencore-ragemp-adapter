@@ -5,6 +5,10 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "type": "commonjs",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/newcore-network/opencore-ragemp-adapter"
+  },
   "publishConfig": {
     "access": "public"
   },
