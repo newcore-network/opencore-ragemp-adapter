@@ -36,7 +36,7 @@
   },
   "scripts": {
     "build": "tsc -b",
-    "typecheck": "tsc -p src/shared/tsconfig.json --noEmit && tsc -p src/client/tsconfig.json --noEmit && tsc -p src/server/tsconfig.json --noEmit",
+    "typecheck": "tsc -b src/shared/tsconfig.json && tsc -p src/client/tsconfig.json --noEmit && tsc -p src/server/tsconfig.json --noEmit",
     "build:shared": "tsc -b src/shared",
     "build:client": "tsc -b src/client",
     "build:server": "tsc -b src/server",
