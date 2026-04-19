@@ -41,7 +41,6 @@ export class RageMPClientSpawnBridge extends IClientSpawnPort {
   }
 
   async spawn(request: SpawnRequest): Promise<SpawnExecutionResult> {
-    this.closeLoadingScreens()
     await this.setPlayerModel(request.model)
     const ped = await this.ensurePed()
     mp.players.local.position = new mp.Vector3(request.position.x, request.position.y, request.position.z)
@@ -62,15 +61,6 @@ export class RageMPClientSpawnBridge extends IClientSpawnPort {
     if (typeof request.heading === 'number') {
       mp.players.local.heading = request.heading
     }
-  }
-
-  private closeLoadingScreens(): void {
-    try {
-      this.platform.shutdownLoadingScreen()
-    } catch {}
-    try {
-      this.platform.shutdownLoadingScreenNui()
-    } catch {}
   }
 
   private async setPlayerModel(model: string): Promise<void> {
