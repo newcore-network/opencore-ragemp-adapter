@@ -1,3 +1,6 @@
+> [!WARNING]
+>  We will discontinue support for this adapter as Ragemp is closing its doors in July. We will continue our efforts on [FiveMAdapter](https://github.com/newcore-network/opencore-fivem-adapter). We no longer recommend using this adapter.
+
 # @open-core/ragemp-adapter
 
 External Rage Multiplayer adapter for `@open-core/framework`.
